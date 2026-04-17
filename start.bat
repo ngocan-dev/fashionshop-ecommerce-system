@@ -9,7 +9,7 @@ echo.
 set ROOT=%~dp0
 set BACKEND=%ROOT%fashionshop-backend
 set FRONTEND=%ROOT%fashionshop-frontend
-set SQLFILE=%ROOT%ecommerce_db.sql
+set SQLFILE=%ROOT%database\ecommerce_db.sql
 
 :: ---- Tim MySQL ----
 set MYSQL=mysql
