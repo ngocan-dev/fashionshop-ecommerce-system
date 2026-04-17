@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" fill="none">
+  <rect width="1600" height="1000" fill="#C9C9C9"/>
+  <rect y="750" width="1600" height="250" fill="#ADADAD"/>
+  <rect x="140" y="120" width="1320" height="710" fill="#D9D9D9"/>
+  <rect x="180" y="180" width="300" height="320" fill="#C7C7C7"/>
+  <rect x="520" y="180" width="240" height="320" fill="#C5C5C5"/>
+  <rect x="800" y="180" width="240" height="320" fill="#C5C5C5"/>
+  <rect x="1080" y="180" width="300" height="320" fill="#C7C7C7"/>
+  <rect x="170" y="520" width="1260" height="260" fill="#E3E3E3"/>
+  <rect x="290" y="560" width="210" height="200" fill="#B9B9B9"/>
+  <rect x="690" y="540" width="240" height="230" fill="#B0B0B0"/>
+  <rect x="1110" y="560" width="210" height="200" fill="#B9B9B9"/>
+  <text x="780" y="625" text-anchor="middle" fill="#6C6C6C" font-size="44" font-family="Arial">RONE</text>
+</svg>

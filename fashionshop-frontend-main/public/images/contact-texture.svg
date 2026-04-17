@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" fill="none">
+  <rect width="1200" height="900" fill="#161616"/>
+  <path d="M0 0H1200V900H0V0Z" fill="url(#weave)"/>
+  <rect x="0" y="0" width="1200" height="900" fill="url(#fade)"/>
+  <defs>
+    <pattern id="weave" width="22" height="22" patternUnits="userSpaceOnUse">
+      <rect width="22" height="22" fill="#171717"/>
+      <rect x="0" y="10" width="22" height="2" fill="#232323"/>
+      <rect x="10" y="0" width="2" height="22" fill="#212121"/>
+      <rect x="0" y="4" width="22" height="1" fill="#2A2A2A"/>
+      <rect x="4" y="0" width="1" height="22" fill="#2B2B2B"/>
+    </pattern>
+    <linearGradient id="fade" x1="600" y1="0" x2="600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2D2D2D" stop-opacity="0.08"/>
+      <stop offset="0.7" stop-color="#000000" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.62"/>
+    </linearGradient>
+  </defs>
+</svg>

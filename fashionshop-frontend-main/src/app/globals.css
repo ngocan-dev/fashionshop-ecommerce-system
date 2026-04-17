@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import '../styles/tokens.css';
+@import 'tailwindcss';
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 35%, white);
+  color: var(--on-surface);
+}
+
+@layer base {
+  :root {
+    /* 18 Studio Palette */
+    --primary: #000000;
+    --on-primary: #e2e2e2;
+    --primary-container: #3b3b3b;
+    --on-primary-container: #ffffff;
+    
+    --secondary: #5e604d;
+    --on-secondary: #ffffff;
+    --secondary-container: #d6d6be;
+    --on-secondary-container: #1b1d0e;
+    
+    --tertiary: #393c3d;
+    --on-tertiary: #e1e2e4;
+    --tertiary-container: #737577;
+    --on-tertiary-container: #ffffff;
+    
+    --error: #ba1a1a;
+    --on-error: #ffffff;
+    --error-container: #ffdad6;
+    --on-error-container: #410002;
+    
+    --background: #f9f9f9;
+    --on-background: #1a1c1c;
+    
+    --surface: #f9f9f9;
+    --on-surface: #1a1c1c;
+    --surface-variant: #e2e2e2;
+    --on-surface-variant: #474747;
+    
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #f3f3f4;
+    --surface-container: #eeeeee;
+    --surface-container-high: #e8e8e8;
+    --surface-container-highest: #e2e2e2;
+    
+    --outline: #777777;
+    --outline-variant: #c6c6c6;
+    
+    --inverse-surface: #2f3131;
+    --inverse-on-surface: #f0f1f1;
+    --inverse-primary: #c6c6c6;
+
+    --font-headline: 'Epilogue', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-label: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .container-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+}
