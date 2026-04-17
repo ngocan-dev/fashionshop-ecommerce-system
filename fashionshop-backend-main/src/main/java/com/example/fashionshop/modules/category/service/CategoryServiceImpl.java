@@ -10,6 +10,7 @@ import com.example.fashionshop.modules.user.entity.User;
 import com.example.fashionshop.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -23,6 +24,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse create(CategoryRequest request) {
         String email = SecurityUtil.getCurrentUsername();
+        if (!StringUtils.hasText(email)) {
+            throw new ResourceNotFoundException("User not found");
+        }
         User creator = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 

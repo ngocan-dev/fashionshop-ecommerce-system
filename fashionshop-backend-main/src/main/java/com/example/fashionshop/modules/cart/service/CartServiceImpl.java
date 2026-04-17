@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -138,6 +139,9 @@ public class CartServiceImpl implements CartService {
 
     private User getCurrentUser() {
         String email = SecurityUtil.getCurrentUsername();
+        if (!StringUtils.hasText(email)) {
+            throw new ResourceNotFoundException("Current user not found");
+        }
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Current user not found"));
     }

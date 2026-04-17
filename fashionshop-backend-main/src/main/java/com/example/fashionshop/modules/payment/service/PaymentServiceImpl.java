@@ -27,6 +27,7 @@ import com.example.fashionshop.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -214,7 +215,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private User getCurrentUser() {
-        return userRepository.findByEmail(SecurityUtil.getCurrentUsername())
+        String email = SecurityUtil.getCurrentUsername();
+        if (!StringUtils.hasText(email)) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }

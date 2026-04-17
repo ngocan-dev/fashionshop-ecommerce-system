@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -289,6 +290,9 @@ public class ProductServiceImpl implements ProductService {
 
     private User getCurrentUser() {
         String email = SecurityUtil.getCurrentUsername();
+        if (!StringUtils.hasText(email)) {
+            throw new ResourceNotFoundException("User not found");
+        }
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
