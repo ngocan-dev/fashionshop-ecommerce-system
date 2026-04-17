@@ -3,6 +3,10 @@ import Link from 'next/link';
 import { newArrivals } from '@/data/homepage-data';
 
 export function NewArrivalsSection() {
+  if (newArrivals.length === 0) {
+    return null;
+  }
+
   return (
     <section className="bg-zinc-100 py-12 md:py-16">
       <div className="mx-auto w-full max-w-[1440px] px-6 md:px-8 lg:px-12">

@@ -46,29 +46,4 @@ export const categories: Category[] = [
   },
 ];
 
-export const newArrivals: NewArrival[] = [
-  {
-    id: '18studio-sculpted-blazer',
-    name: '18.STUDIO Sculpted Blazer',
-    category: 'READY-TO-WEAR / FW24',
-    price: '$1,450.00',
-    image: '/images/product-blazer.svg',
-    href: '/products/18studio-sculpted-blazer',
-  },
-  {
-    id: 'kinetic-pleat-trousers',
-    name: 'Kinetic Pleat Trousers',
-    category: 'READY-TO-WEAR / FW24',
-    price: '$890.00',
-    image: '/images/product-trousers.svg',
-    href: '/products/kinetic-pleat-trousers',
-  },
-  {
-    id: 'draped-cotton-poplin',
-    name: 'Draped Cotton Poplin',
-    category: 'READY-TO-WEAR / FW24',
-    price: '$620.00',
-    image: '/images/product-shirt.svg',
-    href: '/products/draped-cotton-poplin',
-  }
-];
+export const newArrivals: NewArrival[] = [];
