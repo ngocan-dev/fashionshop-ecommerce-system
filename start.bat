@@ -7,8 +7,8 @@ echo ==========================================
 echo.
 
 set ROOT=%~dp0
-set BACKEND=%ROOT%fashionshop-backend-main
-set FRONTEND=%ROOT%fashionshop-frontend-main
+set BACKEND=%ROOT%fashionshop-backend
+set FRONTEND=%ROOT%fashionshop-frontend
 set SQLFILE=%ROOT%ecommerce_db.sql
 
 :: ---- Tim MySQL ----
