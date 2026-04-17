@@ -22,11 +22,12 @@ public enum OrderStatus {
         this.value = value;
     }
 
+    @JsonValue
     public String getValue() {
         return value;
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static OrderStatus fromValue(String value) {
         if (value == null || value.isBlank()) {
             return null;
