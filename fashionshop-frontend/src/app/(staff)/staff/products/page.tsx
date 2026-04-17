@@ -8,6 +8,7 @@ import { Pagination } from "@/components/common/pagnition";
 import { AdminProductsFilters } from "@/features/products/components/admin/admin-products-filters";
 import { useDeleteManageProductMutation, useManageProductsQuery } from "@/features/products/hooks";
 import { toast } from 'sonner';
+import type { Product } from "@/types/product";
 
 export default function StaffProductsPage() {
   const [page, setPage] = useState(0);
@@ -23,6 +24,7 @@ export default function StaffProductsPage() {
   });
 
   const deleteMutation = useDeleteManageProductMutation();
+  const products: Product[] = data?.items ?? [];
 
   const handleDelete = (id: string) => {
     deleteMutation.mutate(id, {
@@ -60,8 +62,8 @@ export default function StaffProductsPage() {
       {/* Stats Section */}
       <ProductStats 
         totalItems={data?.total || 0}
-        outOfStock={data?.items.filter(p => p.stockQuantity === 0).length || 0}
-        active={data?.items.filter(p => p.isActive).length || 0}
+        outOfStock={products.filter((p) => p.stockQuantity === 0).length}
+        active={products.filter((p) => p.isActive).length}
       />
 
       {/* Filters Section */}
@@ -81,7 +83,7 @@ export default function StaffProductsPage() {
       {/* Main Table Content */}
       <div className="space-y-8">
         <ProductTable 
-          products={data?.items || []} 
+          products={products} 
           isLoading={isLoading} 
           onDelete={handleDelete}
         />

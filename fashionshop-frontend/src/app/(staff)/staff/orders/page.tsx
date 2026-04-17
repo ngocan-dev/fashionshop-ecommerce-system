@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useManageOrdersQuery } from '@/features/orders/hooks';
 import { AdminOrdersFilters } from '@/features/orders/components/admin/admin-orders-filters';
 import { Pagination } from '@/components/common/pagnition';
-import type { OrderStatus } from '@/types/order';
+import type { Order, OrderStatus } from '@/types/order';
 
 export default function StaffOrdersPage() {
   const [page, setPage] = useState(0);
@@ -20,6 +20,7 @@ export default function StaffOrdersPage() {
     status: status || undefined,
   });
 
+  const orders: Order[] = data?.items ?? [];
   const totalPages = data ? Math.ceil(data.total / pageSize) : 0;
 
   return (
@@ -70,7 +71,7 @@ export default function StaffOrdersPage() {
                   <td colSpan={5} className="px-6 py-8 bg-neutral-50/50" />
                 </tr>
               ))
-            ) : data?.items.map((order) => (
+            ) : orders.map((order) => (
               <tr key={order.id} className="hover:bg-neutral-50/50 transition-colors group">
                 <td className="px-6 py-5">
                   <div className="flex flex-col">
@@ -112,7 +113,7 @@ export default function StaffOrdersPage() {
           </tbody>
         </table>
         
-        {data?.items.length === 0 && !isLoading && (
+        {orders.length === 0 && !isLoading && (
           <div className="py-20 text-center">
             <p className="text-neutral-400 text-sm italic">No matching orders found.</p>
           </div>

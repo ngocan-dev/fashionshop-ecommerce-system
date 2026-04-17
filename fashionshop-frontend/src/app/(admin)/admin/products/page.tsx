@@ -16,6 +16,7 @@ import { ProductTable } from "@/features/products/components/admin/product-table
 import { ProductStats } from "@/features/products/components/product-stats";
 import { Pagination } from "@/components/common/pagnition";
 import { AdminProductsFilters } from "@/features/products/components/admin/admin-products-filters";
+import type { Product } from "@/types/product";
 
 export default function AdminProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,7 +36,7 @@ export default function AdminProductsPage() {
 
   const deleteMutation = useDeleteManageProductMutation();
 
-  const products = response?.items ?? [];
+  const products: Product[] = response?.items ?? [];
   const totalItems = response?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 

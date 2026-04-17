@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useManageOrdersQuery } from "@/features/orders/hooks";
 import { useDebounce } from "@/hooks/use-debounce";
 //import { cn } from "@/lib/utils/cn";
-import type { OrderStatus } from "@/types/order";
+import type { Order, OrderStatus } from "@/types/order";
 import { Pagination } from "@/components/common/pagnition";
 import { AdminOrdersTable } from "@/features/orders/components/admin/admin-orders-table";
 import { AdminOrdersFilters } from "@/features/orders/components/admin/admin-orders-filters";
@@ -38,7 +38,7 @@ export default function AdminOrdersPage() {
     size: pageSize,
   });
 
-  const orders = response?.items ?? [];
+  const orders: Order[] = response?.items ?? [];
   const totalItems = response?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
