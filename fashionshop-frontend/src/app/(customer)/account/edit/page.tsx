@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { EmptyState } from '@/components/common/empty-state';
 import { LoadingState } from '@/components/common/loading-state';
@@ -8,6 +9,7 @@ import { ProfileForm } from '@/features/users/components/profile-form';
 import { toast } from 'sonner';
 
 export default function EditAccountPage() {
+  const router = useRouter();
   const meQuery = useMeQuery();
   const updateMutation = useUpdateMeMutation();
 
@@ -20,7 +22,17 @@ export default function EditAccountPage() {
         <h1 className="text-2xl font-semibold">Edit profile</h1>
       </CardHeader>
       <CardContent>
-        <ProfileForm user={meQuery.data} onSubmit={(values) => updateMutation.mutate(values, { onSuccess: () => toast.success('Profile saved') })} />
+        <ProfileForm
+          user={meQuery.data}
+          onSubmit={(values) =>
+            updateMutation.mutate(values, {
+              onSuccess: () => {
+                toast.success('Profile saved');
+                router.push('/account');
+              },
+            })
+          }
+        />
       </CardContent>
     </Card>
   );
