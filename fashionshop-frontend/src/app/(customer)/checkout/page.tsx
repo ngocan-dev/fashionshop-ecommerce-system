@@ -14,6 +14,7 @@ export default function CheckoutPage() {
   const createOrderMutation = useCreateOrderMutation();
 
   if (summaryQuery.isLoading) return <LoadingState label="Loading checkout" />;
+  if (summaryQuery.isError) return <EmptyState title="Failed to load checkout" description="Something went wrong loading your checkout. Please try again." actionLabel="Go to cart" actionHref="/cart" />;
   if (!summaryQuery.data) return <EmptyState title="Checkout unavailable" description="Add items to your cart first." actionLabel="Go to cart" actionHref="/cart" />;
 
   const summary = summaryQuery.data;
@@ -45,6 +46,9 @@ export default function CheckoutPage() {
                   } else {
                     router.push('/orders');
                   }
+                },
+                onError: (error: { message?: string }) => {
+                  toast.error(error?.message || 'Failed to place order. Please try again.');
                 },
               })
             }

@@ -109,7 +109,7 @@ CREATE TABLE `invoices` (
   `issued_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `note` text,
   `total_amount` decimal(10,2) NOT NULL DEFAULT '0.00',
-  `payment_status` enum('pending','paid','failed','refunded') NOT NULL DEFAULT 'pending',
+  `payment_status` enum('PENDING','PAID','FAILED','REFUNDED') NOT NULL DEFAULT 'PENDING',
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_id` (`order_id`),
   UNIQUE KEY `invoice_number` (`invoice_number`),
@@ -166,7 +166,7 @@ DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int DEFAULT NULL,
-  `status` enum('pending','confirmed','shipping','completed','cancelled') NOT NULL DEFAULT 'pending',
+  `status` enum('PENDING','CONFIRMED','PROCESSING','SHIPPED','DELIVERED','COMPLETED','CANCELLED') NOT NULL DEFAULT 'PENDING',
   `total_price` decimal(10,2) DEFAULT NULL,
   `receiver_name` varchar(100) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
@@ -198,8 +198,8 @@ DROP TABLE IF EXISTS `payments`;
 CREATE TABLE `payments` (
   `id` int NOT NULL AUTO_INCREMENT,
   `order_id` int DEFAULT NULL,
-  `payment_method` enum('COD','Banking','Momo','VNPay') DEFAULT NULL,
-  `payment_status` enum('unpaid','paid','failed') DEFAULT 'unpaid',
+  `payment_method` enum('COD','BANKING','MOMO','VNPAY') DEFAULT NULL,
+  `payment_status` enum('PENDING','PROCESSING','UNPAID','PAID','FAILED','CANCELLED') DEFAULT 'UNPAID',
   `paid_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `order_id` (`order_id`),
@@ -262,7 +262,7 @@ CREATE TABLE `users` (
   `full_name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` enum('customer','staff','admin') DEFAULT 'customer',
+  `role` enum('CUSTOMER','STAFF','ADMIN') DEFAULT 'CUSTOMER',
   `is_active` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -276,7 +276,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Admin Account','admin@gmail.com','123456','admin',1,'2026-03-03 14:36:50'),(2,'Staff Account','staff@gmail.com','123456','staff',1,'2026-03-03 14:36:50'),(3,'Customer Account','customer@gmail.com','123456','customer',1,'2026-03-03 14:36:50');
+INSERT INTO `users` VALUES (1,'Admin Account','admin@gmail.com','$2a$10$64vTJyJT.oiP8EP0BZzeq.ZYvpNRs9/T2AQUkK2BrC8.kAR/4ZU9q','ADMIN',1,'2026-03-03 14:36:50'),(2,'Staff Account','staff@gmail.com','$2a$10$64vTJyJT.oiP8EP0BZzeq.ZYvpNRs9/T2AQUkK2BrC8.kAR/4ZU9q','STAFF',1,'2026-03-03 14:36:50'),(3,'Customer Account','customer@gmail.com','$2a$10$64vTJyJT.oiP8EP0BZzeq.ZYvpNRs9/T2AQUkK2BrC8.kAR/4ZU9q','CUSTOMER',1,'2026-03-03 14:36:50');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
