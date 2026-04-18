@@ -23,7 +23,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ex.getMessage()));
     }
 
-    @ExceptionHandler({BadRequestException.class, InvalidAccountDeletionException.class, AccountCreationException.class})
+    @ExceptionHandler({ BadRequestException.class, InvalidAccountDeletionException.class,
+            AccountCreationException.class })
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(RuntimeException ex) {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
@@ -43,11 +44,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(ex.getMessage()));
     }
 
-    @ExceptionHandler({ForbiddenException.class, AccessDeniedException.class})
+    @ExceptionHandler({ ForbiddenException.class, AccessDeniedException.class })
     public ResponseEntity<ApiResponse<Object>> handleForbidden(Exception ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("Access denied"));
     }
-
 
     @ExceptionHandler(PaymentCancelledException.class)
     public ResponseEntity<ApiResponse<Object>> handlePaymentCancelled(PaymentCancelledException ex) {
