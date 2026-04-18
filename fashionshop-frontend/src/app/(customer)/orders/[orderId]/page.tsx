@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { EmptyState } from '@/components/common/empty-state';
 import { LoadingState } from '@/components/common/loading-state';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,19 @@ export default function OrderDetailPage() {
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold">Order {orderQuery.data.orderNumber ?? orderQuery.data.id}</h1>
-          <Button variant="outline" onClick={() => cancelMutation.mutate()}>Cancel order</Button>
+          <Button
+            variant="outline"
+            disabled={cancelMutation.isPending}
+            onClick={() =>
+              cancelMutation.mutate(undefined, {
+                onSuccess: () => toast.success('Order cancelled successfully.'),
+                onError: (error: { message?: string }) =>
+                  toast.error(error?.message || 'Failed to cancel order.'),
+              })
+            }
+          >
+            {cancelMutation.isPending ? 'Cancelling...' : 'Cancel order'}
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

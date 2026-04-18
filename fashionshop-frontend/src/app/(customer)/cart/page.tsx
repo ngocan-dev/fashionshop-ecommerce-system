@@ -15,9 +15,17 @@ import { useState } from 'react';
 export default function CartPage() {
   const cartQuery = useCartQuery();
   const [confirmItemId, setConfirmItemId] = useState<number | null>(null);
+  const [localQuantities, setLocalQuantities] = useState<Record<number, number>>({});
   const deleteMutation = useDeleteCartItemMutation();
   const quantityMutation = useUpdateCartItemQuantityMutation();
   const hasBackendError = cartQuery.isError;
+
+  const getQuantity = (itemId: number, serverQuantity: number) =>
+    localQuantities[itemId] ?? serverQuantity;
+
+  const hasChanges = cartQuery.data?.items.some(
+    (item) => localQuantities[item.itemId] !== undefined && localQuantities[item.itemId] !== item.quantity
+  ) ?? false;
 
   // Show loading state
   if (cartQuery.isPending) {
@@ -126,14 +134,15 @@ export default function CartPage() {
                             toast.info('Cart data is unavailable right now.');
                             return;
                           }
-                          quantityMutation.mutate({ itemId: item.itemId, quantity: Math.max(1, item.quantity - 1) });
+                          const current = getQuantity(item.itemId, item.quantity);
+                          if (current > 1) setLocalQuantities((prev) => ({ ...prev, [item.itemId]: current - 1 }));
                         }}
                         className="h-auto rounded-md p-1 hover:opacity-50"
                         aria-label="Decrease quantity"
                       >
                         <span className="material-symbols-outlined text-sm">remove</span>
                       </Button>
-                      <span className="w-8 text-center text-sm font-bold tabular-nums">{item.quantity.toString().padStart(2, '0')}</span>
+                      <span className="w-8 text-center text-sm font-bold tabular-nums">{getQuantity(item.itemId, item.quantity).toString().padStart(2, '0')}</span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -143,7 +152,8 @@ export default function CartPage() {
                             toast.info('Cart data is unavailable right now.');
                             return;
                           }
-                          quantityMutation.mutate({ itemId: item.itemId, quantity: item.quantity + 1 });
+                          const current = getQuantity(item.itemId, item.quantity);
+                          setLocalQuantities((prev) => ({ ...prev, [item.itemId]: current + 1 }));
                         }}
                         className="h-auto rounded-md p-1 hover:opacity-50"
                         aria-label="Increase quantity"
@@ -151,7 +161,7 @@ export default function CartPage() {
                         <span className="material-symbols-outlined text-sm">add</span>
                       </Button>
                     </div>
-                    <div className="font-headline text-xl font-bold">${(item.price * item.quantity).toFixed(2)}</div>
+                    <div className="font-headline text-xl font-bold">${(item.price * getQuantity(item.itemId, item.quantity)).toFixed(2)}</div>
                   </div>
                 </div>
               </CardContent>
@@ -202,8 +212,37 @@ export default function CartPage() {
                 <Button asChild className="h-11 w-full rounded-md bg-black text-xs font-bold uppercase tracking-[0.24em] !text-white transition-all duration-300 hover:scale-[1.02] hover:bg-[#474747] active:scale-95">
                   <Link href="/checkout" style={{ color: '#ffffff' }}>Checkout</Link>
                 </Button>
-                <Button type="button" variant="outline" className="h-11 w-full rounded-md border-[#c6c6c64d] bg-white text-xs font-bold uppercase tracking-[0.24em] text-black hover:bg-[#f3f3f4]">
-                  Update Cart
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={!hasChanges || quantityMutation.isPending}
+                  className="h-11 w-full rounded-md border-[#c6c6c64d] bg-white text-xs font-bold uppercase tracking-[0.24em] text-black hover:bg-[#f3f3f4]"
+                  onClick={() => {
+                    if (!cartQuery.data) return;
+                    const changed = cartQuery.data.items.filter(
+                      (item) => localQuantities[item.itemId] !== undefined && localQuantities[item.itemId] !== item.quantity
+                    );
+                    let completed = 0;
+                    changed.forEach((item) => {
+                      quantityMutation.mutate(
+                        { itemId: item.itemId, quantity: localQuantities[item.itemId] },
+                        {
+                          onSuccess: () => {
+                            completed++;
+                            if (completed === changed.length) {
+                              setLocalQuantities({});
+                              toast.success('Cart updated successfully.');
+                            }
+                          },
+                          onError: (error: { message?: string }) => {
+                            toast.error(error?.message || 'Failed to update cart.');
+                          },
+                        }
+                      );
+                    });
+                  }}
+                >
+                  {quantityMutation.isPending ? 'Updating...' : 'Update Cart'}
                 </Button>
               </div>
 
