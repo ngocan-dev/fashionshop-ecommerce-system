@@ -3,12 +3,13 @@
 import { useForm, type UseFormRegisterReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 import type { CheckoutSummary } from '@/types/order';
 
 const checkoutSchema = z.object({
   firstName: z.string().min(1, 'Required'),
   lastName: z.string().min(1, 'Required'),
-  phone: z.string().min(6, 'Required'),
+  phone: z.string().min(1, 'Phone number is required').regex(/^\+?[0-9]{9,15}$/, 'Phone number is invalid (9–15 digits, optional + prefix)'),
   addressLine1: z.string().min(3, 'Required'),
   city: z.string().min(1, 'Required'),
   postalCode: z.string().min(1, 'Required'),
@@ -67,7 +68,7 @@ export function CheckoutForm({
   };
 
   return (
-    <form id="checkout-form" onSubmit={form.handleSubmit(handleSubmit)}>
+    <form id="checkout-form" onSubmit={form.handleSubmit(handleSubmit, () => { toast.error('Please fill in all required fields.'); })}>
       {/* 01 Shipping Information */}
       <section className="mb-14">
         <h2 className="font-headline mb-10 text-xl font-black tracking-tight md:text-2xl">

@@ -124,7 +124,8 @@ public class GlobalExceptionHandler {
             return ResponseEntity.badRequest().body(ApiResponse.error("Invalid quantity"));
         }
 
-        return ResponseEntity.badRequest().body(ApiResponse.error("Validation failed: " + errors));
+        String message = String.join("; ", errors.values());
+        return ResponseEntity.badRequest().body(ApiResponse.error(message));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

@@ -135,7 +135,7 @@ export default function ProductDetailPage() {
 
           {/* Stock indicator */}
           <p className="mb-8 text-[10px] font-bold uppercase tracking-[0.3em] text-[#777777]">
-            {(product.stock ?? 0) > 0 ? `${product.stock} in stock` : 'Out of stock'}
+            {(product.stockQuantity ?? 0) > 0 ? `${product.stockQuantity} in stock` : 'Out of stock'}
           </p>
 
           {/* Action buttons */}
@@ -143,7 +143,7 @@ export default function ProductDetailPage() {
             <Button
               type="button"
               className="h-14 w-full rounded-md bg-black text-sm font-bold uppercase tracking-[0.24em] !text-white transition-all duration-300 hover:scale-[1.02] hover:bg-[#474747] active:scale-95"
-              disabled={(product.stock ?? 0) === 0}
+              disabled={(product.stockQuantity ?? 0) === 0}
                 onClick={() => {
                 addToCart.mutate(
                   { productId: Number(product.id), quantity: 1 },

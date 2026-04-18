@@ -106,6 +106,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderEventPublisher orderEventPublisher;
 
     @Override
+    @Transactional(readOnly = true)
     public CheckoutSummaryResponse getCheckoutSummary() {
         User user = getCurrentUser();
         Cart cart = cartRepository.findByUser(user).orElse(null);
@@ -311,6 +312,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponse> getMyOrders() {
         User user = getCurrentUser();
         return orderRepository.findByUser(user).stream()
@@ -323,6 +325,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginationResponse<OrderSummaryResponse> getMyOrderHistory(CustomerOrderHistoryQuery query) {
         User user = getCurrentUser();
 
@@ -357,6 +360,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderDetailResponse getMyOrderDetail(Integer orderId) {
         try {
             User user = getCurrentUser();
@@ -371,6 +375,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderStatusTrackingResponse getMyOrderTrackingStatus(Integer orderId) {
         try {
             User user = getCurrentUser();
@@ -414,6 +419,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders() {
         return orderRepository.findAll().stream()
                 .map(order -> OrderMapper.toResponse(
@@ -425,6 +431,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginationResponse<OrderSummaryResponse> getManageOrderSummaries(OrderListQuery query) {
         try {
             Sort sort = resolveSort(query.getSortBy(), query.getSortDir());
@@ -453,6 +460,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
