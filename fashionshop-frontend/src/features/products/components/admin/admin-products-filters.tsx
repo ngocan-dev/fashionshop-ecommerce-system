@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils/cn";
+import { useCategoriesQuery } from "@/features/categories/hooks";
 
 type Props = {
   categoryId: number | null;
@@ -7,27 +8,24 @@ type Props = {
   onSearch: (value: string) => void;
 };
 
-const CATEGORY_TABS = [
-  { label: "All", value: null },
-  { label: "Outerwear", value: 1 },
-  { label: "Tailoring", value: 2 },
-  { label: "Bottoms", value: 3 },
-  { label: "Knitwear", value: 4 },
-  { label: "Accessories", value: 5 },
-  { label: "Ready-to-Wear", value: 6 },
-];
-
 export function AdminProductsFilters({
   categoryId,
   onCategoryChange,
   searchTerm,
   onSearch,
 }: Props) {
+  const { data: categories = [] } = useCategoriesQuery();
+
+  const categoryTabs = [
+    { label: "All", value: null },
+    ...categories.map(c => ({ label: c.name, value: c.id }))
+  ];
+
   return (
     <div className="grid grid-cols-12 gap-6 mb-8">
       {/* Category Tabs */}
       <div className="col-span-12 lg:col-span-8 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        {CATEGORY_TABS.map((tab) => (
+        {categoryTabs.map((tab) => (
           <button
             key={tab.label}
             onClick={() => onCategoryChange(tab.value)}

@@ -15,4 +15,6 @@ export type StaffAccount = AuthUser & {
 
 export type CustomerAccount = AuthUser & {
   loyaltyPoints?: number;
+  totalOrders?: number;
+  totalSpend?: number;
 };

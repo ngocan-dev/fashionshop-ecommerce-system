@@ -20,7 +20,7 @@ function hasAccess(role: Role, pathname: string) {
 }
 
 function roleHome(role: Role) {
-  if (role === 'ADMIN') return '/admin/dashboard';
+  if (role === 'ADMIN') return '/admin/products';
   if (role === 'STAFF') return '/staff/products';
   if (role === 'CUSTOMER') return '/account';
   return '/';

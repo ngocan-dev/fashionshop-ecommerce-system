@@ -4,12 +4,8 @@ import type { CheckoutSummary, CreateOrderRequest, Order, OrderFilter, OrderSumm
 import type { Payment } from '@/types/payment';
 import { mockOrders, getMockOrder, mockCart } from '@/data/mock-data';
 
-// TODO: Remove mock helpers once the real backend is available
 const USE_MOCK = false;
 
-// ---------------------------------------------------------------------------
-// Normalizers: bridge backend field names → frontend type field names
-// ---------------------------------------------------------------------------
 
 function normalizeOrderItem(raw: any): OrderSummaryItem {
   const price = raw.price ?? raw.unitPrice ?? 0;
@@ -27,7 +23,11 @@ function normalizeOrderItem(raw: any): OrderSummaryItem {
 function normalizeOrder(raw: any): Order {
   return {
     ...raw,
-    total: raw.total ?? raw.totalPrice ?? 0,
+    id: raw.id ? String(raw.id) : (raw.orderId ? String(raw.orderId) : raw.orderCode),
+    customerName: raw.customerName || raw.receiverName || '',
+    status: raw.status || raw.orderStatus || 'PENDING',
+    createdAt: raw.createdAt || raw.orderDate || new Date().toISOString(),
+    total: raw.total ?? raw.totalAmount ?? raw.totalPrice ?? 0,
     subtotal: raw.subtotal ?? raw.totalPrice ?? 0,
     shippingFee: raw.shippingFee ?? 0,
     discount: raw.discount ?? raw.discountAmount ?? 0,
@@ -160,7 +160,7 @@ export async function fetchManageOrders(filter?: OrderFilter) {
       size,
     };
   }
-  const response = await api.get<ApiResponse<any>>('/api/orders/manage', { params: filter });
+  const response = await api.get<ApiResponse<any>>('/api/orders', { params: filter });
   const raw = await apiRequest(Promise.resolve(response));
   if (raw && Array.isArray(raw.items)) return { ...raw, items: raw.items.map(normalizeOrder) };
   return raw;

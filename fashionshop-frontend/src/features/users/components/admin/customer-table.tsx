@@ -74,7 +74,7 @@ export function CustomerTable({ customers, onDelete, onActivate, isLoading }: Pr
                       {customer.fullName}
                     </span>
                     <span className="text-[10px] text-neutral-400 uppercase tracking-tighter">
-                      ID: #{customer.id.substring(0, 8)}
+                      ID: #{customer.id}  
                     </span>
                   </div>
                 </div>
@@ -83,10 +83,10 @@ export function CustomerTable({ customers, onDelete, onActivate, isLoading }: Pr
                 <span className="text-sm text-neutral-600">{customer.email}</span>
               </td>
               <td className="px-6 py-5">
-                <span className="text-sm font-medium">0</span>
+                <span className="text-sm font-medium">{customer.totalOrders || 0}</span>
               </td>
               <td className="px-6 py-5 text-sm font-headline font-bold">
-                $0.00
+                ${Number(customer.totalSpend || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
               <td className="px-6 py-5">
                 <span className={cn(

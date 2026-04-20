@@ -179,7 +179,14 @@ export async function updateManageProduct(id: string, request: UpsertProductRequ
     }
     return { id, ...request } as Product;
   }
-  const response = await api.put<ApiResponse<Product>>(`/api/products/manage/${id}`, request);
+  
+  const payload = {
+    ...request,
+    status: request.isActive ? 'ACTIVE' : 'INACTIVE',
+    imageUrls: request.imageUrl ? [request.imageUrl] : [],
+  };
+
+  const response = await api.put<ApiResponse<Product>>(`/api/products/manage/${id}`, payload);
   return apiRequest(Promise.resolve(response));
 }
 

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useCreateProductMutation, useUpdateManageProductMutation } from '@/features/products/hooks';
+import { useCategoriesQuery } from '@/features/categories/hooks';
 import { cn } from '@/lib/utils/cn';
 import type { Product } from '@/types/product';
 
@@ -27,12 +28,14 @@ type ProductFormValues = z.infer<typeof productSchema>;
 
 type Props = {
   initialData?: Product;
+  redirectPath?: string;
 };
 
-export function ProductForm({ initialData }: Props) {
+export function ProductForm({ initialData, redirectPath = '/admin/products' }: Props) {
   const router = useRouter();
   const createMutation = useCreateProductMutation();
   const updateMutation = useUpdateManageProductMutation(initialData?.id || '');
+  const { data: categories = [] } = useCategoriesQuery();
 
   const {
     register,
@@ -47,7 +50,7 @@ export function ProductForm({ initialData }: Props) {
       description: initialData?.description || '',
       price: initialData?.price || 0,
       stockQuantity: initialData?.stockQuantity || 0,
-      categoryId: initialData?.categoryId || 1,
+      categoryId: initialData?.categoryId || undefined,
       isActive: initialData?.isActive ?? true,
       isFeatured: initialData?.isFeatured ?? false,
       imageUrl: initialData?.imageUrl || '',
@@ -57,17 +60,21 @@ export function ProductForm({ initialData }: Props) {
 
   const watchedValues = useWatch({ control }) as Partial<ProductFormValues>;
 
+  const watchedCategoryId =
+    watchedValues.categoryId === undefined ? undefined : String(watchedValues.categoryId);
+  const previewCategorySelected = categories.find(c => c.id === watchedCategoryId);
+
   const onSubmit: SubmitHandler<ProductFormValues> = (data) => {
     const payload = {
       ...data,
-      categoryId: data.categoryId || 1, 
+      categoryId: data.categoryId || (categories.length > 0 ? categories[0].id : 1), 
     };
 
     if (initialData) {
       updateMutation.mutate(payload as any, {
         onSuccess: () => {
           toast.success('Product updated successfully');
-          router.push('/admin/products');
+          router.push(redirectPath);
         },
         onError: (error: any) => {
           toast.error(error.message || 'Failed to update product');
@@ -77,7 +84,7 @@ export function ProductForm({ initialData }: Props) {
       createMutation.mutate(payload as any, {
         onSuccess: () => {
           toast.success('Product created successfully');
-          router.push('/admin/products');
+          router.push(redirectPath);
         },
         onError: (error: any) => {
           toast.error(error.message || 'Failed to create product');
@@ -252,12 +259,9 @@ export function ProductForm({ initialData }: Props) {
                   {...register('categoryId')}
                   className="w-full bg-surface-container-low border-none rounded-md px-4 py-3 text-sm focus:ring-1 focus:ring-black appearance-none cursor-pointer"
                 >
-                  <option value={1}>Outerwear</option>
-                  <option value={2}>Tailoring</option>
-                  <option value={3}>Bottoms</option>
-                  <option value={4}>Knitwear</option>
-                  <option value={5}>Accessories</option>
-                  <option value={6}>Ready-to-Wear</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
                 </select>
               </div>
 
@@ -313,11 +317,7 @@ export function ProductForm({ initialData }: Props) {
               </h3>
               <div className="flex justify-between items-baseline">
                 <span className="text-sm opacity-60">
-                   {watchedValues.categoryId == 1 ? 'Outerwear' : 
-                    watchedValues.categoryId == 2 ? 'Tailoring' :
-                    watchedValues.categoryId == 3 ? 'Bottoms' :
-                    watchedValues.categoryId == 4 ? 'Knitwear' : 
-                    watchedValues.categoryId == 5 ? 'Accessories' : 'Ready-to-Wear'}
+                   {previewCategorySelected ? previewCategorySelected.name : 'Uncategorized'}
                 </span>
                 <span className="text-xl font-medium">
                   ${Number(watchedValues.price || 0).toLocaleString()}

@@ -2,18 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ProductTable } from "@/features/products/components/admin/product-table";
-import { ProductStats } from "@/features/products/components/product-stats";
-import { Pagination } from "@/components/common/pagnition";
-import { AdminProductsFilters } from "@/features/products/components/admin/admin-products-filters";
-import { useDeleteManageProductMutation, useManageProductsQuery } from "@/features/products/hooks";
 import { toast } from 'sonner';
-import type { Product } from "@/types/product";
+import { ConfirmDialog } from '@/components/common/confirm-dialog';
+import { Pagination } from '@/components/common/pagnition';
+import { ProductTable } from '@/features/products/components/admin/product-table';
+import { ProductStats } from '@/features/products/components/product-stats';
+import { AdminProductsFilters } from '@/features/products/components/admin/admin-products-filters';
+import { useDeleteManageProductMutation, useManageProductsQuery } from '@/features/products/hooks';
+import type { Product } from '@/types/product';
 
 export default function StaffProductsPage() {
   const [page, setPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const pageSize = 8;
 
   const { data, isLoading } = useManageProductsQuery({
@@ -26,9 +28,14 @@ export default function StaffProductsPage() {
   const deleteMutation = useDeleteManageProductMutation();
   const products: Product[] = data?.items ?? [];
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, {
-      onSuccess: () => toast.success('Product deleted successfully'),
+  const handleDelete = () => {
+    if (!deleteId) return;
+
+    deleteMutation.mutate(deleteId, {
+      onSuccess: () => {
+        toast.success('Product deleted successfully');
+        setDeleteId(null);
+      },
       onError: () => toast.error('Failed to delete product'),
     });
   };
@@ -37,7 +44,6 @@ export default function StaffProductsPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 lg:p-8 space-y-10 bg-white min-h-screen">
-      {/* Header */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
@@ -59,15 +65,13 @@ export default function StaffProductsPage() {
         </div>
       </header>
 
-      {/* Stats Section */}
-      <ProductStats 
+      <ProductStats
         totalItems={data?.total || 0}
         outOfStock={products.filter((p) => p.stockQuantity === 0).length}
         active={products.filter((p) => p.isActive).length}
       />
 
-      {/* Filters Section */}
-      <AdminProductsFilters 
+      <AdminProductsFilters
         categoryId={categoryId}
         onCategoryChange={(id) => {
           setCategoryId(id);
@@ -80,17 +84,17 @@ export default function StaffProductsPage() {
         }}
       />
 
-      {/* Main Table Content */}
       <div className="space-y-8">
-        <ProductTable 
-          products={products} 
-          isLoading={isLoading} 
-          onDelete={handleDelete}
+        <ProductTable
+          products={products}
+          isLoading={isLoading}
+          onDelete={setDeleteId}
+          editBasePath="/staff/products"
         />
 
         {!isLoading && totalPages > 1 && (
           <div className="flex justify-center pt-8 border-t border-neutral-100">
-            <Pagination 
+            <Pagination
               page={page + 1}
               totalPages={totalPages}
               pageSize={pageSize}
@@ -101,12 +105,23 @@ export default function StaffProductsPage() {
         )}
       </div>
 
-      {/* Footer Info */}
       <footer className="pt-12 border-t border-neutral-100 flex flex-col items-center gap-4">
         <p className="text-[10px] font-bold tracking-widest uppercase text-neutral-300">
-          Studio 18 • Staff Portal • {new Date().getFullYear()}
+          Studio 18 · Staff Portal · {new Date().getFullYear()}
         </p>
       </footer>
+
+      <ConfirmDialog
+        open={Boolean(deleteId)}
+        title="Delete product?"
+        description="Are you sure you want to delete this product? This action cannot be undone and will remove the item from all listings."
+        destructive
+        confirmLabel="Delete"
+        onOpenChange={(open) => {
+          if (!open) setDeleteId(null);
+        }}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }
