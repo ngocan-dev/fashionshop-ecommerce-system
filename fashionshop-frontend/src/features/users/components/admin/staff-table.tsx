@@ -1,7 +1,6 @@
 'use client';
 
 import Image from "next/image";
-import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 import type { StaffAccount } from "@/types/user";
 
@@ -70,7 +69,8 @@ export function StaffTable({ staffRows, onDelete, onActivate, isLoading }: Props
                       {staff.fullName}
                     </span>
                     <span className="text-[10px] text-neutral-400 uppercase tracking-tighter">
-                      ID: #{staff.id.substring(0, 8)}
+                      ID: #{staff.id}
+                      {/*ID: #{staff.id.substring(0, 8)*/}
                     </span>
                   </div>
                 </div>
@@ -95,22 +95,25 @@ export function StaffTable({ staffRows, onDelete, onActivate, isLoading }: Props
               
               {/* Actions */}
               <td className="px-6 py-5 text-right space-x-4">
-                {staff.isActive !== false ? (
-                  <Link 
-                    href={`/admin/staff-accounts/${staff.id}`}
-                    className="text-[10px] tracking-widest uppercase font-bold text-neutral-400 hover:text-black transition-all"
-                  >
-                    View Profile
-                  </Link>
-                ) : (
-                  <button 
-                    onClick={() => onActivate?.(staff.id)}
-                    className="text-[10px] tracking-widest uppercase font-bold text-green-600 hover:text-green-800 transition-all underline underline-offset-4"
-                  >
-                    Activate
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (staff.isActive === false) {
+                      onActivate?.(staff.id);
+                    }
+                  }}
+                  disabled={staff.isActive !== false}
+                  className={cn(
+                    "text-[10px] tracking-widest uppercase font-bold border-b-2 border-transparent transition-all",
+                    staff.isActive !== false
+                      ? "text-neutral-300 cursor-not-allowed"
+                      : "text-green-600 hover:border-green-600"
+                  )}
+                >
+                  Activate
+                </button>
                 <button 
+                  type="button"
                   onClick={() => onDelete(staff.id)}
                   className="text-[10px] tracking-widest uppercase font-bold text-error border-b-2 border-transparent hover:border-error transition-all"
                 >

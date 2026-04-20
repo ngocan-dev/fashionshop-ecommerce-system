@@ -81,34 +81,6 @@ export function RoleShell({ role, children }: { role: 'STAFF' | 'ADMIN'; childre
         </aside>
 
         <div className="flex min-h-screen flex-1 flex-col ml-64">
-          {/* TOP NAV BAR */}
-          {/* <header className="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-white/70 backdrop-blur-xl flex justify-between items-center px-8 z-40 font-body text-sm tracking-tight border-b border-surface-container">
-            <div className="flex items-center gap-4 w-1/3">
-              <div className="relative w-full focus-within:ring-1 focus-within:ring-primary transition-all rounded-md">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
-                <input 
-                  className="w-full bg-surface-container-low border-none rounded-md py-2 pl-10 text-xs focus:ring-0" 
-                  placeholder="Search orders, products, or customers..." 
-                  type="text"
-                />
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-6">
-              <button className="text-on-surface-variant hover:text-primary transition-all">
-                <span className="material-symbols-outlined">notifications</span>
-              </button>
-              <button className="text-on-surface-variant hover:text-primary transition-all">
-                <span className="material-symbols-outlined">settings</span>
-              </button>
-              <div className="h-4 w-[1px] bg-outline-variant"></div>
-              <a className="text-on-surface-variant hover:text-primary font-medium" href="#">Support</a>
-              <button className="bg-primary text-on-primary px-4 py-1.5 rounded-md font-semibold text-xs transition-transform hover:scale-105 active:scale-95">
-                Profile
-              </button>
-            </div>
-          </header> */}
-
           <main className="flex-1 mt-16 p-10 min-h-screen bg-surface">
             {children}
           </main>

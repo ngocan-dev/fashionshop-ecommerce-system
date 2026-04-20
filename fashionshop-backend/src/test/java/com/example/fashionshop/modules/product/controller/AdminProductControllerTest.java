@@ -71,6 +71,7 @@ class AdminProductControllerTest {
 
         when(productService.getManageProducts(0, 10, null)).thenReturn(page);
 
+
         mockMvc.perform(get("/api/products/manage")
                         .param("page", "0")
                         .param("size", "10")

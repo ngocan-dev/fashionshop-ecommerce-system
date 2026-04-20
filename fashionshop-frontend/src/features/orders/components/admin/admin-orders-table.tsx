@@ -36,6 +36,10 @@ const FULFILLMENT_STATUS_CONFIG: Record<
     label: "Delivered",
     className: "bg-emerald-50 text-emerald-700",
   },
+  COMPLETED: {
+    label: "Completed",
+    className: "bg-emerald-50 text-emerald-700",
+  },
   CANCELLED: {
     label: "Cancelled",
     className: "bg-neutral-100 text-neutral-400",
@@ -126,7 +130,10 @@ export function AdminOrdersTable({ orders, isLoading }: Props) {
               const payment =
                 PAYMENT_STATUS_CONFIG[paymentKey] ??
                 PAYMENT_STATUS_CONFIG.PENDING;
-              const fulfillment = FULFILLMENT_STATUS_CONFIG[order.status];
+              const fulfillmentKey = order.status ?? "PENDING";
+              const fulfillment =
+                FULFILLMENT_STATUS_CONFIG[fulfillmentKey] ??
+                FULFILLMENT_STATUS_CONFIG.PENDING;
 
               // Customer display — API doesn't return name/email, fall back to order info
               const displayName =

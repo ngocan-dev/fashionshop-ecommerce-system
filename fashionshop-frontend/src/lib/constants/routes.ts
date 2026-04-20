@@ -24,7 +24,7 @@ export const routePaths = {
   staffProducts: '/staff/products',
   staffCategories: '/staff/categories',
   staffOrders: '/staff/orders',
-  adminDashboard: '/admin/dashboard',
+  adminDashboard: '/admin/products',
   adminStaff: '/admin/staff-accounts',
   adminCustomers: '/admin/customers',
 } as const;

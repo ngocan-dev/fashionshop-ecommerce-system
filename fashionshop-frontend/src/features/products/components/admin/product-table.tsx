@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils/cn';
 import type { Product } from '@/types/product';
@@ -9,9 +8,10 @@ type Props = {
   products: Product[];
   onDelete: (id: string) => void;
   isLoading?: boolean;
+  editBasePath?: string;
 };
 
-export function ProductTable({ products, onDelete, isLoading }: Props) {
+export function ProductTable({ products, onDelete, isLoading, editBasePath = '/admin/products' }: Props) {
   return (
     <table className="w-full text-left border-collapse">
       <thead>
@@ -63,10 +63,8 @@ export function ProductTable({ products, onDelete, isLoading }: Props) {
             </td>
           </tr>
         ) : (
-          products.map((product) => {
-          return (
+          products.map((product) => (
             <tr key={product.id} className="hover:bg-surface-container-low/50 group">
-              {/* Image */}
               <td className="px-6 py-4">
                 <div className="relative w-12 h-16 mx-auto rounded overflow-hidden bg-neutral-100">
                   <img
@@ -77,7 +75,6 @@ export function ProductTable({ products, onDelete, isLoading }: Props) {
                 </div>
               </td>
 
-              {/* Name */}
               <td className="px-6 py-4">
                 <p className="font-bold text-sm">{product.name}</p>
                 <p className="text-[10px] text-neutral-400 uppercase">
@@ -85,22 +82,18 @@ export function ProductTable({ products, onDelete, isLoading }: Props) {
                 </p>
               </td>
 
-              {/* Category */}
               <td className="px-6 py-4">
                 <span className="px-2 py-1 bg-neutral-100 rounded text-[10px] uppercase">
                   {product.categoryName || 'Uncategorized'}
                 </span>
               </td>
 
-              {/* Stock */}
               <td className="px-6 py-4 text-sm">{product.stockQuantity}</td>
 
-              {/* Price */}
               <td className="px-6 py-4 font-semibold">
                 ${product.price.toLocaleString()}
               </td>
 
-              {/* Status */}
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
                   <div className={cn('w-1.5 h-1.5 rounded-full', product.isActive ? 'bg-green-500' : 'bg-neutral-400')} />
@@ -110,20 +103,18 @@ export function ProductTable({ products, onDelete, isLoading }: Props) {
                 </div>
               </td>
 
-              {/* Actions */}
               <td className="px-6 py-4 text-right">
-                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100">
-                  <Link href={`/admin/products/${product.id}/edit`}>
-                    ✏️
+                <div className="flex justify-end gap-4 opacity-0 group-hover:opacity-100">
+                  <Link href={`${editBasePath}/${product.id}/edit`} className="text-sm font-medium hover:underline">
+                    Edit
                   </Link>
-                  <button onClick={() => onDelete(product.id)}>
-                    🗑
+                  <button type="button" onClick={() => onDelete(product.id)} className="text-sm font-medium text-red-600 hover:underline">
+                    Delete
                   </button>
                 </div>
               </td>
             </tr>
-          );
-        })
+          ))
         )}
       </tbody>
     </table>

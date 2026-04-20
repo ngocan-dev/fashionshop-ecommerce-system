@@ -31,7 +31,7 @@ export default function StaffEditProductPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-10 py-12">
-      <ProductForm initialData={product} />
+      <ProductForm initialData={product} redirectPath="/staff/products" />
     </div>
   );
 }

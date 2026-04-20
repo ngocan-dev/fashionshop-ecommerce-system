@@ -267,12 +267,19 @@ public class UserServiceImpl implements UserService {
     }
 
     private CustomerAccountResponse toCustomerAccountResponse(User user) {
+        java.util.List<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user);
+        java.math.BigDecimal totalSpend = orders.stream()
+                .map(o -> o.getTotalPrice() != null ? o.getTotalPrice() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
         return CustomerAccountResponse.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .status(Boolean.TRUE.equals(user.getIsActive()) ? "ACTIVE" : "INACTIVE")
+                .totalOrders(orders.size())
+                .totalSpend(totalSpend)
                 .build();
     }
 

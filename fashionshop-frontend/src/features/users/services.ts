@@ -42,7 +42,7 @@ export async function fetchMyOrders() {
   return apiRequest(Promise.resolve(response));
 }
 
-export async function createStaffAccount(request: { fullName: string; email: string; password?: string; role?: string }) {
+export async function createStaffAccount(request: { fullName: string; email: string; password?: string; confirmPassword?: string; role?: string }) {
   if (USE_MOCK) {
     const newStaff: StaffAccount = {
       id: Math.random().toString(36).substring(7),
@@ -99,14 +99,24 @@ export async function deleteAdminUser(userId: string) {
 
 export async function fetchAdminStaffAccounts() {
   if (USE_MOCK) return mockStaff;
-  const response = await api.get<ApiResponse<StaffAccount[]>>('/api/admin/staff-accounts');
-  return apiRequest(Promise.resolve(response));
+  const response = await api.get<ApiResponse<any>>('/api/admin/staff-accounts');
+  const raw = await apiRequest(Promise.resolve(response));
+  return Array.isArray(raw) ? raw.map((staff: any) => ({
+    ...staff,
+    isActive: staff.status === 'ACTIVE',
+  })) : [];
 }
 
 export async function fetchAdminCustomerAccounts() {
   if (USE_MOCK) return mockCustomers;
-  const response = await api.get<ApiResponse<CustomerAccount[]>>('/api/admin/customer-accounts');
-  return apiRequest(Promise.resolve(response));
+  const response = await api.get<ApiResponse<any>>('/api/admin/customer-accounts');
+  const raw = await apiRequest(Promise.resolve(response));
+  return Array.isArray(raw) ? raw.map((c: any) => ({
+    ...c,
+    isActive: c.status === 'ACTIVE',
+    totalOrders: c.totalOrders || 0,
+    totalSpend: c.totalSpend || 0,
+  })) : [];
 }
 
 export async function activateAdminUser(userId: string) {
