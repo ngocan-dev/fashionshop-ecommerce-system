@@ -18,6 +18,14 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Page<Product> findByIsActiveTrueAndNameContainingIgnoreCase(String keyword, Pageable pageable);
 
     Page<Product> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
+    
+    Page<Product> findByCategoryId(Integer categoryId, Pageable pageable);
+    
+    Page<Product> findByNameContainingIgnoreCaseAndCategoryId(String keyword, Integer categoryId, Pageable pageable);
+
+    Page<Product> findByIsActiveTrueAndCategoryId(Integer categoryId, Pageable pageable);
+
+    Page<Product> findByIsActiveTrueAndNameContainingIgnoreCaseAndCategoryId(String keyword, Integer categoryId, Pageable pageable);
 
     @Query("""
             SELECT p

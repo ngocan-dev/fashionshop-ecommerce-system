@@ -25,7 +25,7 @@ public interface ProductService {
 
     ProductDetailResponse updateManageProduct(Integer productId, ProductManageUpdateRequest request);
 
-    PaginationResponse<ProductManageSummaryResponse> getManageProducts(int page, int size, String keyword);
+    PaginationResponse<ProductManageSummaryResponse> getManageProducts(int page, int size, String keyword, Integer categoryId);
 
     PaginationResponse<ProductResponse> getProducts(int page, int size, String keyword);
 

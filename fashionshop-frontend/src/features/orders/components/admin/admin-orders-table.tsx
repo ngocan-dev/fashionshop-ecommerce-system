@@ -21,12 +21,12 @@ const PAYMENT_STATUS_CONFIG: Record<
   REFUNDED: { label: "Refunded", className: "bg-amber-50 text-amber-700" },
 };
 
-const FULFILLMENT_STATUS_CONFIG: Record<
+const ORDER_STATUS_CONFIG: Record<
   string,
   { label: string; className: string; strikethrough?: boolean }
 > = {
   PENDING: {
-    label: "Unfulfilled",
+    label: "Pending",
     className: "bg-neutral-100 text-neutral-600",
   },
   CONFIRMED: { label: "Confirmed", className: "bg-blue-50 text-blue-700" },
@@ -69,7 +69,7 @@ export function AdminOrdersTable({ orders, isLoading }: Props) {
               Payment
             </th>
             <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
-              Fulfillment
+              Order Status
             </th>
             <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-neutral-500 text-right">
               Action
@@ -130,10 +130,10 @@ export function AdminOrdersTable({ orders, isLoading }: Props) {
               const payment =
                 PAYMENT_STATUS_CONFIG[paymentKey] ??
                 PAYMENT_STATUS_CONFIG.PENDING;
-              const fulfillmentKey = order.status ?? "PENDING";
-              const fulfillment =
-                FULFILLMENT_STATUS_CONFIG[fulfillmentKey] ??
-                FULFILLMENT_STATUS_CONFIG.PENDING;
+              const orderStatusKey = order.status ?? "PENDING";
+              const orderStatus =
+                ORDER_STATUS_CONFIG[orderStatusKey] ??
+                ORDER_STATUS_CONFIG.PENDING;
 
               // Customer display — API doesn't return name/email, fall back to order info
               const displayName =
@@ -143,19 +143,19 @@ export function AdminOrdersTable({ orders, isLoading }: Props) {
                 order.customerEmail ?? order.paymentMethod ?? "—";
               const initials = order.customerName
                 ? order.customerName
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)
-                    .toUpperCase()
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()
                 : (order.orderNumber ?? order.id).slice(-2).toUpperCase();
 
               const formattedDate = order.createdAt
                 ? new Date(order.createdAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
                 : "—";
 
               return (
@@ -210,16 +210,16 @@ export function AdminOrdersTable({ orders, isLoading }: Props) {
                     </span>
                   </td>
 
-                  {/* Fulfillment Status */}
+                  {/* Order Status */}
                   <td className="px-8 py-6">
                     <span
                       className={cn(
                         "inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider",
-                        fulfillment.className,
-                        fulfillment.strikethrough && "line-through",
+                        orderStatus.className,
+                        orderStatus.strikethrough && "line-through",
                       )}
                     >
-                      {fulfillment.label}
+                      {orderStatus.label}
                     </span>
                   </td>
 

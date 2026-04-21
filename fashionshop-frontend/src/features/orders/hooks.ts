@@ -66,9 +66,9 @@ export function useOrdersQuery() {
 }
 
 export function useManageOrdersQuery(filter?: OrderFilter) {
-  return useQuery({ 
-    queryKey: [...queryKeys.orders, 'manage', filter], 
-    queryFn: () => fetchManageOrders(filter) 
+  return useQuery({
+    queryKey: [...queryKeys.orders, 'manage', filter],
+    queryFn: () => fetchManageOrders(filter)
   });
 }
 

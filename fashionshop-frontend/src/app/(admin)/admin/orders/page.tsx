@@ -44,12 +44,12 @@ export default function AdminOrdersPage() {
 
   const pendingCount = orders.filter(o => o.status === 'PENDING').length;
 
-const fulfilled = orders.filter(
-  o => o.status === 'DELIVERED' || o.status === 'SHIPPED'
-).length;
+  const completed = orders.filter(
+    o => o.status === 'DELIVERED' || o.status === 'SHIPPED' || o.status === 'COMPLETED'
+  ).length;
 
-const fulfillmentRate =
-  orders.length > 0 ? Math.round((fulfilled / orders.length) * 100) : 0;
+  const completionRate =
+    orders.length > 0 ? Math.round((completed / orders.length) * 100) : 0;
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -87,7 +87,7 @@ const fulfillmentRate =
       {/* ── Order Insights ────────────────────────────────────────────────── */}
       <AdminOrdersInsights
         pendingCount={pendingCount}
-        fulfillmentRate={fulfillmentRate}
+        completionRate={completionRate}
         onGoToPending={() => handleStatusChange("PENDING")}
       />
     </div>

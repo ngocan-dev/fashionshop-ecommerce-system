@@ -30,8 +30,9 @@ public class AdminProductController {
     public ApiResponse<PaginationResponse<ProductManageSummaryResponse>> getProductList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword) {
-        PaginationResponse<ProductManageSummaryResponse> response = productService.getManageProducts(page, size, keyword);
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer categoryId) {
+        PaginationResponse<ProductManageSummaryResponse> response = productService.getManageProducts(page, size, keyword, categoryId);
         String message = response.getItems().isEmpty() ? "No products available" : "Product list fetched successfully";
         return ApiResponse.success(message, response);
     }

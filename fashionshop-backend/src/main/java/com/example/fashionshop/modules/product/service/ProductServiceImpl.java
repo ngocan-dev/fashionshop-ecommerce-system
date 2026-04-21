@@ -161,13 +161,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PaginationResponse<ProductManageSummaryResponse> getManageProducts(int page, int size, String keyword) {
+    public PaginationResponse<ProductManageSummaryResponse> getManageProducts(int page, int size, String keyword, Integer categoryId) {
         validatePagination(page, size);
 
         try {
-            Page<Product> result = (keyword == null || keyword.isBlank())
-                    ? productRepository.findByIsActiveTrue(PageRequest.of(page, size))
-                    : productRepository.findByIsActiveTrueAndNameContainingIgnoreCase(keyword, PageRequest.of(page, size));
+            Page<Product> result;
+            boolean hasKeyword = StringUtils.hasText(keyword);
+            boolean hasCategory = categoryId != null;
+
+            if (hasKeyword && hasCategory) {
+                result = productRepository.findByIsActiveTrueAndNameContainingIgnoreCaseAndCategoryId(keyword, categoryId, PageRequest.of(page, size));
+            } else if (hasKeyword) {
+                result = productRepository.findByIsActiveTrueAndNameContainingIgnoreCase(keyword, PageRequest.of(page, size));
+            } else if (hasCategory) {
+                result = productRepository.findByIsActiveTrueAndCategoryId(categoryId, PageRequest.of(page, size));
+            } else {
+                result = productRepository.findByIsActiveTrue(PageRequest.of(page, size));
+            }
 
             return PaginationResponse.<ProductManageSummaryResponse>builder()
                     .items(result.getContent().stream().map(ProductMapper::toManageSummaryResponse).toList())

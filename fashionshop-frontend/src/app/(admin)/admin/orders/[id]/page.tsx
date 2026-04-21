@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils/cn';
 
 export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  
+
   const unwrappedParams = use(params);
   const { id } = unwrappedParams;
 
@@ -70,23 +70,23 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
             <span className={cn(
               "font-semibold uppercase text-xs",
               isCancelled ? "text-red-600" : "text-black"
-            )}>{order.status}</span>
+            )}>{order.status.charAt(0) + order.status.slice(1).toLowerCase()}</span>
           </p>
         </div>
         <div className="flex gap-3">
-          <button 
+          <button
             onClick={handleCancelOrder}
             disabled={isCancelled || statusMutation.isPending}
             className={cn(
               "px-6 py-3 border text-xs font-bold uppercase tracking-widest transition-colors rounded-md",
-              isCancelled 
+              isCancelled
                 ? "bg-neutral-50 border-neutral-100 text-neutral-300 cursor-not-allowed"
                 : "bg-surface-container-lowest border-neutral-200 text-neutral-600 hover:bg-neutral-50"
             )}
           >
             {statusMutation.isPending ? 'Processing...' : isCancelled ? 'Order Cancelled' : 'Cancel Order'}
           </button>
-          <button 
+          <button
             disabled={isCancelled || statusMutation.isPending}
             className={cn(
               "px-8 py-3 bg-black text-white text-xs font-bold uppercase tracking-widest hover:scale-105 active:opacity-80 transition-all rounded-md flex items-center gap-2",
@@ -102,7 +102,7 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
       <div className="grid grid-cols-12 gap-10 pb-20">
         {/* Left Area: Summary & Logistics (8 cols) */}
         <div className="col-span-12 lg:col-span-8 space-y-12">
-          
+
           {/* Order Summary */}
           <section>
             <div className="flex items-center justify-between mb-6">
@@ -110,7 +110,7 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
                 Order Items <span className="text-neutral-400 font-normal ml-2">({order.items.length})</span>
               </h3>
             </div>
-            
+
             <div className="bg-surface-container-lowest rounded-xl p-2 border border-neutral-100">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -127,10 +127,10 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
                         <div className="flex items-center gap-4">
                           <div className="w-20 h-24 bg-surface-container-low rounded-lg overflow-hidden flex-shrink-0 relative border border-neutral-100">
                             {item.imageUrl ? (
-                              <img 
-                                src={item.imageUrl} 
-                                alt={item.name} 
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
@@ -156,7 +156,7 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
 
           {/* Shipping & Timeline Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
+
             {/* Shipping Address */}
             <section className="bg-surface-container-lowest border border-neutral-100 p-8 rounded-xl shadow-sm">
               <div className="flex items-center gap-3 mb-6">
@@ -178,7 +178,7 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
                 <span className="material-symbols-outlined text-black">history</span>
                 <h4 className="font-headline text-lg font-bold text-black">Activity Log</h4>
               </div>
-              
+
               <div className="space-y-6 relative before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-px before:bg-neutral-200">
                 {order.activityLog && order.activityLog.length > 0 ? (
                   order.activityLog.map((log, index) => (
@@ -206,7 +206,7 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
 
         {/* Right Sidebar: Financials & Customer (4 cols) */}
         <div className="col-span-12 lg:col-span-4 space-y-8">
-          
+
           {/* Customer Snippet */}
           <section className="bg-surface-container-lowest p-8 rounded-xl border border-neutral-100 shadow-sm">
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-6">Customer Details</h4>
@@ -255,7 +255,7 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
           <section className="bg-black text-white p-8 rounded-xl shadow-2xl relative overflow-hidden">
             {/* Subtle background element */}
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-white opacity-5 rounded-full blur-2xl"></div>
-            
+
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-8">Financial Summary</h4>
             <div className="space-y-4 relative z-10">
               <div className="flex justify-between items-center text-sm opacity-80">
@@ -269,12 +269,12 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
               <div className="flex justify-between items-center text-sm opacity-80">
                 <span>Discount</span>
                 <span className={order.discount > 0 ? "text-green-400" : ""}>
-                   -${order.discount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  -${order.discount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              
+
               <div className="h-px bg-white/10 my-6"></div>
-              
+
               <div className="flex justify-between items-end">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">Total Amount</p>
@@ -290,9 +290,9 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
           {/* Help/Notes */}
           <div className="p-5 border border-dashed border-neutral-300 rounded-xl bg-surface-container-lowest">
             <p className="text-[10px] text-neutral-500 text-center uppercase tracking-widest font-bold">Internal Order Notes</p>
-            <textarea 
-              className="w-full mt-4 bg-transparent border-none text-xs focus:ring-0 italic placeholder:text-neutral-400 h-24 resize-none" 
-              placeholder="Add a private note for the fulfillment team..."
+            <textarea
+              className="w-full mt-4 bg-transparent border-none text-xs focus:ring-0 italic placeholder:text-neutral-400 h-24 resize-none"
+              placeholder="Add a private note for the order management team..."
               defaultValue={order.note || ''}
             ></textarea>
           </div>

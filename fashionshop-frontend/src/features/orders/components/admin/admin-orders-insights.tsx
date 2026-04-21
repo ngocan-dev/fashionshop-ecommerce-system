@@ -1,12 +1,12 @@
 type Props = {
   pendingCount: number;
-  fulfillmentRate: number;
+  completionRate: number;
   onGoToPending: () => void;
 };
 
 export function AdminOrdersInsights({
   pendingCount,
-  fulfillmentRate,
+  completionRate,
   onGoToPending,
 }: Props) {
   return (
@@ -26,10 +26,10 @@ export function AdminOrdersInsights({
         </div>
       </div> */}
 
-      {/* Fulfillment */}
+      {/* Completion */}
       {/* <div className="p-8 bg-surface-container-low rounded-xl border border-outline/5">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 mb-6">
-          Fulfillment Rate
+          Completion Rate
         </p>
         <div className="flex items-end gap-4">
           <h3 className="text-3xl font-headline font-extrabold tracking-tighter">
