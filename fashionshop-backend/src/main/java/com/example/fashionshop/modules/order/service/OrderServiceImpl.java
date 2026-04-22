@@ -663,7 +663,8 @@ public class OrderServiceImpl implements OrderService {
                                 criteriaBuilder.like(criteriaBuilder.lower(root.get("receiverName")), keyword),
                                 criteriaBuilder.like(criteriaBuilder.lower(root.get("phone")), keyword),
                                 criteriaBuilder.like(criteriaBuilder.lower(root.get("user").get("fullName")), keyword),
-                                criteriaBuilder.like(criteriaBuilder.lower(root.get("user").get("email")), keyword)));
+                                criteriaBuilder.like(criteriaBuilder.lower(root.get("user").get("email")), keyword),
+                                criteriaBuilder.like(root.get("id").as(String.class), keyword)));
             }
 
             return predicates;

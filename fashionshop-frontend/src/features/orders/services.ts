@@ -21,16 +21,18 @@ function normalizeOrderItem(raw: any): OrderSummaryItem {
 }
 
 function normalizeOrder(raw: any): Order {
+  const summary = raw.summary || {};
+  
   return {
     ...raw,
-    id: raw.id ? String(raw.id) : (raw.orderId ? String(raw.orderId) : raw.orderCode),
-    customerName: raw.customerName || raw.receiverName || '',
-    status: raw.status || raw.orderStatus || 'PENDING',
-    createdAt: raw.createdAt || raw.orderDate || new Date().toISOString(),
-    total: raw.total ?? raw.totalAmount ?? raw.totalPrice ?? 0,
-    subtotal: raw.subtotal ?? raw.totalPrice ?? 0,
-    shippingFee: raw.shippingFee ?? 0,
-    discount: raw.discount ?? raw.discountAmount ?? 0,
+    id: raw.id ? String(raw.id) : (raw.orderId ? String(raw.orderId) : (summary.orderId ? String(summary.orderId) : raw.orderCode)),
+    customerName: raw.customerName || raw.receiverName || summary.customerName || '',
+    status: raw.status || raw.orderStatus || raw.currentStatus || summary.orderStatus || 'PENDING',
+    createdAt: raw.createdAt || raw.orderDate || summary.orderDate || new Date().toISOString(),
+    total: raw.total ?? raw.totalAmount ?? summary.totalAmount ?? raw.totalPrice ?? 0,
+    subtotal: raw.subtotal ?? summary.subtotal ?? raw.totalPrice ?? 0,
+    shippingFee: raw.shippingFee ?? summary.shippingFee ?? 0,
+    discount: raw.discount ?? raw.discountAmount ?? summary.discountAmount ?? 0,
     items: Array.isArray(raw.items) ? raw.items.map(normalizeOrderItem) : [],
   };
 }
@@ -137,8 +139,8 @@ export async function fetchManageOrders(filter?: OrderFilter) {
 
     if (filter?.keyword) {
       const k = filter.keyword.toLowerCase();
-      filteredItems = filteredItems.filter(o => 
-        o.orderNumber?.toLowerCase().includes(k) || 
+      filteredItems = filteredItems.filter(o =>
+        o.orderNumber?.toLowerCase().includes(k) ||
         o.customerName?.toLowerCase().includes(k) ||
         o.id.toLowerCase().includes(k)
       );
@@ -195,12 +197,12 @@ export async function updateManageOrderStatus(orderId: string, status: string) {
         activityLog: [
           {
             status: `Order ${status.toLowerCase()}`,
-            timestamp: new Date().toLocaleString('en-US', { 
-              month: 'short', 
-              day: 'numeric', 
-              year: 'numeric', 
-              hour: 'numeric', 
-              minute: '2-digit' 
+            timestamp: new Date().toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit'
             }),
             isPrimary: true
           },

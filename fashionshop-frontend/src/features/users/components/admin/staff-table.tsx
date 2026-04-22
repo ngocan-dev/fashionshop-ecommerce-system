@@ -97,18 +97,8 @@ export function StaffTable({ staffRows, onDelete, onActivate, isLoading }: Props
               <td className="px-6 py-5 text-right space-x-4">
                 <button
                   type="button"
-                  onClick={() => {
-                    if (staff.isActive === false) {
-                      onActivate?.(staff.id);
-                    }
-                  }}
-                  disabled={staff.isActive !== false}
-                  className={cn(
-                    "text-[10px] tracking-widest uppercase font-bold border-b-2 border-transparent transition-all",
-                    staff.isActive !== false
-                      ? "text-neutral-300 cursor-not-allowed"
-                      : "text-green-600 hover:border-green-600"
-                  )}
+                  onClick={() => onActivate?.(staff.id)}
+                  className="text-[10px] tracking-widest uppercase font-bold text-green-600 border-b-2 border-transparent hover:border-green-600 transition-all"
                 >
                   Activate
                 </button>

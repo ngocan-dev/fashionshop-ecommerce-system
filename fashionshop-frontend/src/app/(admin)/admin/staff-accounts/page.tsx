@@ -39,7 +39,7 @@ export default function AdminStaffAccountsPage() {
       const matchSearch =
         s.fullName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         s.email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        s.id.toLowerCase().includes(debouncedSearch.toLowerCase());
+        String(s.id).toLowerCase().includes(debouncedSearch.toLowerCase());
       const matchStatus = 
         statusFilter === 'all' || 
         (statusFilter === 'active' && s.isActive !== false) ||

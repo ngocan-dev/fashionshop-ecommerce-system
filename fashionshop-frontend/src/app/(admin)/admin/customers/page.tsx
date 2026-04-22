@@ -61,11 +61,16 @@ export default function AdminCustomersPage() {
     return filteredCustomers.slice(start, start + pageSize);
   }, [filteredCustomers, page, pageSize]);
 
-  const stats = {
-    totalActive: customers.length,
-    avgSpend: 0,
-    newRegistrations: Math.floor(customers.length * 0.1),
-  };
+  const stats = useMemo(() => {
+    const totalSpend = customers.reduce((acc, c) => acc + (c.totalSpend || 0), 0);
+    const avgSpend = customers.length > 0 ? totalSpend / customers.length : 0;
+    
+    return {
+      totalActive: customers.filter(c => c.isActive !== false).length,
+      avgSpend,
+      newRegistrations: customers.length, // Or keep as is if there's a better metric
+    };
+  }, [customers]);
 
   const handleDelete = () => {
     if (!deleteId) return;

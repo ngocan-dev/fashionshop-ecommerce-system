@@ -30,7 +30,7 @@ export default function StaffOrdersPage() {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <span className="h-px w-8 bg-black/20" />
-            <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-neutral-400">Order Fulfillment</span>
+            <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-neutral-400">Order Management</span>
           </div>
           <h1 className="text-4xl lg:text-5xl font-black tracking-tighter uppercase font-headline text-black">
             Staff Orders
@@ -94,7 +94,7 @@ export default function StaffOrdersPage() {
                     order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
                     'bg-amber-100 text-amber-700'
                   }`}>
-                    {order.status}
+                    {order.status.charAt(0) + order.status.slice(1).toLowerCase()}
                   </span>
                 </td>
                 <td className="px-6 py-5">
@@ -135,7 +135,7 @@ export default function StaffOrdersPage() {
       {/* Footer */}
       <footer className="pt-12 border-t border-neutral-100 text-center">
         <p className="text-[10px] font-bold tracking-widest uppercase text-neutral-300">
-          Studio 18 • Staff Portal • Fulfillment Center
+          Studio 18 • Staff Portal • Management Center
         </p>
       </footer>
     </div>
