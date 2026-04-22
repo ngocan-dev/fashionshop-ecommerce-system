@@ -27,6 +27,13 @@ export default function AdminCustomersPage() {
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
+  const handleStatusFilterChange = (nextStatus: 'all' | 'active' | 'inactive') => {
+    setStatusFilter(nextStatus);
+    setPage(1);
+  };
+
+  const toSearchable = (value: unknown) => String(value ?? '').toLowerCase();
+
   const handleActivate = (id: string) => {
     activateMutation.mutate(id, {
       onSuccess: () => {
@@ -39,11 +46,14 @@ export default function AdminCustomersPage() {
   };
 
   const filteredCustomers = useMemo(() => {
+    const keyword = debouncedSearch.trim().toLowerCase();
+
     return customers.filter((customer) => {
       const matchSearch =
-        customer.fullName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        customer.email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        customer.id.toLowerCase().includes(debouncedSearch.toLowerCase());
+        keyword.length === 0 ||
+        toSearchable(customer.fullName).includes(keyword) ||
+        toSearchable(customer.email).includes(keyword) ||
+        toSearchable(customer.id).includes(keyword);
       const matchStatus =
         statusFilter === 'all' ||
         (statusFilter === 'active' && customer.isActive !== false) ||
@@ -112,7 +122,7 @@ export default function AdminCustomersPage() {
             Filter by:
           </span>
           <button
-            onClick={() => setStatusFilter('all')}
+            onClick={() => handleStatusFilterChange('all')}
             className={cn(
               "px-4 py-1.5 text-xs font-semibold rounded-full transition-all",
               statusFilter === 'all'
@@ -123,7 +133,7 @@ export default function AdminCustomersPage() {
             All
           </button>
           <button
-            onClick={() => setStatusFilter('active')}
+            onClick={() => handleStatusFilterChange('active')}
             className={cn(
               "px-4 py-1.5 text-xs font-semibold rounded-full transition-all",
               statusFilter === 'active'
@@ -134,7 +144,7 @@ export default function AdminCustomersPage() {
             Active
           </button>
           <button
-            onClick={() => setStatusFilter('inactive')}
+            onClick={() => handleStatusFilterChange('inactive')}
             className={cn(
               "px-4 py-1.5 text-xs font-semibold rounded-full transition-all",
               statusFilter === 'inactive'
@@ -174,7 +184,7 @@ export default function AdminCustomersPage() {
             actionLabel="Reset filters"
             onAction={() => {
               setSearchTerm('');
-              setStatusFilter('all');
+              handleStatusFilterChange('all');
             }}
           />
         ) : (

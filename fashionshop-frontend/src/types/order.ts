@@ -35,6 +35,7 @@ export type Order = {
   paymentMethod?: PaymentMethod;
   customerName?: string;
   customerEmail?: string;
+  customerPhone?: string;
   customerAvatar?: string;
   customerTotalOrders?: number;
   items: OrderSummaryItem[];

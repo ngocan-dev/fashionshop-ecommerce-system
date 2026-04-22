@@ -70,7 +70,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void processPayment_shouldMarkOrderAsConfirmedForCod() {
+    void processPayment_shouldKeepOrderPendingForCod() {
         User user = user();
         Order order = order(user);
         Invoice invoice = invoice(order);
@@ -90,12 +90,12 @@ class PaymentServiceImplTest {
         PaymentResponse response = paymentService.processPayment(order.getId(), request);
 
         assertThat(response.getPaymentStatus()).isEqualTo(PaymentStatus.PENDING);
-        assertThat(response.getOrderStatus()).isEqualTo(OrderStatus.CONFIRMED);
-        assertThat(response.getMessage()).isEqualTo("Order confirmed with cash on delivery");
-        verify(orderRepository).save(order);
+        assertThat(response.getOrderStatus()).isEqualTo(OrderStatus.PENDING);
+        assertThat(response.getMessage()).isEqualTo("Cash on delivery selected");
+        verify(orderRepository, never()).save(order);
         verify(invoiceRepository).save(invoice);
         assertThat(invoice.getPaymentStatus()).isEqualTo(InvoicePaymentStatus.PENDING);
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING);
     }
 
     @Test

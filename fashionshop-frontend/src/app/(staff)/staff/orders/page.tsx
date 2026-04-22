@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useManageOrdersQuery } from '@/features/orders/hooks';
 import { AdminOrdersFilters } from '@/features/orders/components/admin/admin-orders-filters';
 import { Pagination } from '@/components/common/pagnition';
@@ -61,14 +60,13 @@ export default function StaffOrdersPage() {
               <th className="px-6 py-4 text-[10px] tracking-widest uppercase font-bold text-neutral-500 font-label">Customer</th>
               <th className="px-6 py-4 text-[10px] tracking-widest uppercase font-bold text-neutral-500 font-label">Status</th>
               <th className="px-6 py-4 text-[10px] tracking-widest uppercase font-bold text-neutral-500 font-label">Total</th>
-              <th className="px-6 py-4 text-[10px] tracking-widest uppercase font-bold text-neutral-500 font-label text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-100 font-body">
             {isLoading ? (
               [...Array(5)].map((_, i) => (
                 <tr key={i} className="animate-pulse">
-                  <td colSpan={5} className="px-6 py-8 bg-neutral-50/50" />
+                  <td colSpan={4} className="px-6 py-8 bg-neutral-50/50" />
                 </tr>
               ))
             ) : orders.map((order) => (
@@ -99,14 +97,6 @@ export default function StaffOrdersPage() {
                 </td>
                 <td className="px-6 py-5">
                   <span className="font-bold text-neutral-900">${order.total.toLocaleString()}</span>
-                </td>
-                <td className="px-6 py-5 text-right">
-                  <Link 
-                    href={`/staff/orders/${order.id}`}
-                    className="text-[10px] tracking-widest uppercase font-bold text-neutral-400 hover:text-black transition-all underline underline-offset-4"
-                  >
-                    Manage
-                  </Link>
                 </td>
               </tr>
             ))}
