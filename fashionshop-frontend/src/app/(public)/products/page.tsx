@@ -20,9 +20,9 @@ export default function ProductsPage() {
   const PAGE_SIZE = 20;
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All Products');
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-  const [priceRange, setPriceRange] = useState(2000);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [priceRange, setPriceRange] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<ProductSortOption>('Newest Arrivals');
   const categoriesQuery = useCategoriesQuery();
 
@@ -59,10 +59,17 @@ export default function ProductsPage() {
       price: item.price,
       imageSrc: item.imageUrl ?? '/images/product-blazer.svg',
       imageAlt: item.name,
-      color: 'black',
-      size: 'M',
     }));
   }, [storeItems]);
+
+  const maxAvailablePrice = useMemo(() => {
+    const prices = productCatalog
+      .map((product) => product.price)
+      .filter((price) => Number.isFinite(price));
+
+    if (prices.length === 0) return 2000;
+    return Math.max(...prices);
+  }, [productCatalog]);
 
   const categories = useMemo(
     () => categoriesQuery.data?.map((category) => category.name) ?? [...new Set(productCatalog.map((p) => p.category))],
@@ -71,11 +78,13 @@ export default function ProductsPage() {
 
   const filteredProducts = useMemo(() => {
     const filtered = productCatalog.filter((product) => {
-      const matchesPrice = product.price <= priceRange;
+      const matchesPrice = priceRange == null || !Number.isFinite(product.price) || product.price <= priceRange;
       return matchesPrice;
     });
     return sortProducts(filtered, sortBy);
   }, [priceRange, sortBy, productCatalog]);
+
+  const resultCount = priceRange == null ? totalResults : filteredProducts.length;
 
   return (
     <main className="min-h-screen bg-[#f6f6f3] text-zinc-900">
@@ -87,6 +96,7 @@ export default function ProductsPage() {
               selectedSize={selectedSize}
               selectedColor={selectedColor}
               priceRange={priceRange}
+              maxPrice={maxAvailablePrice}
               categories={categories}
               onCategoryChange={setSelectedCategory}
               onSizeChange={setSelectedSize}
@@ -98,7 +108,7 @@ export default function ProductsPage() {
           <section className="space-y-8 pt-1">
             <ProductToolbar
               searchTerm={searchTerm}
-              resultCount={totalResults}
+              resultCount={resultCount}
               sortBy={sortBy}
               onSearchChange={setSearchTerm}
               onSortChange={setSortBy}

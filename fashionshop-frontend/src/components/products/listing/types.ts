@@ -7,8 +7,8 @@ export type ProductListingItem = {
   price: number;
   imageSrc: string;
   imageAlt: string;
-  color: string;
-  size: string;
+  color?: string;
+  size?: string;
 };
 
 export type ProductSortOption = 'Newest Arrivals' | 'Price: Low to High' | 'Price: High to Low' | 'Category';

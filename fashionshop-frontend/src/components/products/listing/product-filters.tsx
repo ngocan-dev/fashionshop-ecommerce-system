@@ -1,14 +1,14 @@
 import { cn } from '@/lib/utils/cn';
-import type { ProductCategory } from './types';
 
 type ProductFiltersProps = {
   selectedCategory: string;
-  selectedSize: string;
-  selectedColor: string;
-  priceRange: number;
+  selectedSize: string | null;
+  selectedColor: string | null;
+  priceRange: number | null;
+  maxPrice: number;
   onCategoryChange: (value: string) => void;
-  onSizeChange: (value: string) => void;
-  onColorChange: (value: string) => void;
+  onSizeChange: (value: string | null) => void;
+  onColorChange: (value: string | null) => void;
   onPriceChange: (value: number) => void;
   categories?: string[];
 };
@@ -28,6 +28,7 @@ export function ProductFilters({
   selectedSize,
   selectedColor,
   priceRange,
+  maxPrice,
   onCategoryChange,
   onSizeChange,
   onColorChange,
@@ -35,6 +36,9 @@ export function ProductFilters({
   categories,
 }: ProductFiltersProps) {
   const categoryOptions = categories ? ['All Products', ...categories] : defaultCategoryOptions;
+  const effectiveMaxPrice = Math.max(1, Math.ceil(maxPrice));
+  const effectivePriceRange = priceRange ?? effectiveMaxPrice;
+
   return (
     <aside className="w-full border-b border-zinc-200 pb-8 lg:w-[250px] lg:border-b-0 lg:pb-0">
       <div className="space-y-8">
@@ -69,7 +73,7 @@ export function ProductFilters({
                 <button
                   key={size}
                   type="button"
-                  onClick={() => onSizeChange(active ? '' : size)}
+                  onClick={() => onSizeChange(active ? null : size)}
                   className={cn(
                     'h-10 border text-xs font-semibold uppercase tracking-[0.18em] transition-colors',
                     active ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 hover:text-zinc-900',
@@ -94,7 +98,7 @@ export function ProductFilters({
                   title={color.label}
                   aria-label={color.label}
                   aria-pressed={active}
-                  onClick={() => onColorChange(active ? '' : color.id)}
+                  onClick={() => onColorChange(active ? null : color.id)}
                   className={cn(
                     'flex h-8 w-8 items-center justify-center rounded-full border transition-transform duration-200 hover:-translate-y-0.5',
                     active ? 'border-zinc-900 ring-1 ring-zinc-900/20' : 'border-zinc-300',
@@ -112,15 +116,15 @@ export function ProductFilters({
           <input
             type="range"
             min={0}
-            max={2000}
-            value={priceRange}
+            max={effectiveMaxPrice}
+            value={effectivePriceRange}
             onChange={(event) => onPriceChange(Number(event.target.value))}
             className="h-1 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-900"
             aria-label="Price range"
           />
           <div className="flex items-center justify-between text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-zinc-500">
             <span>$0</span>
-            <span>$2,000+</span>
+            <span>${effectiveMaxPrice.toLocaleString()}</span>
           </div>
         </section>
       </div>
