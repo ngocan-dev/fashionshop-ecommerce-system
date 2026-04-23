@@ -109,7 +109,22 @@ if "%TABLE_COUNT%"=="0" (
     )
     echo [OK] Database imported.
 ) else (
-    echo [OK] Database already has %TABLE_COUNT% tables. Skipping import to keep existing data.
+    set "CORE_DATA_COUNT="
+    for /f "usebackq delims=" %%C in (`%MYSQL% -h %DBHOST% -P %DBPORT% %MYSQL_AUTH% %DBNAME% -N -B -e "SELECT (SELECT COUNT(*) FROM users) + (SELECT COUNT(*) FROM products);" 2^>nul`) do set "CORE_DATA_COUNT=%%C"
+    if not defined CORE_DATA_COUNT set "CORE_DATA_COUNT=0"
+
+    if "%CORE_DATA_COUNT%"=="0" (
+        echo Database has schema but no seed data. Importing initial schema and data...
+        %MYSQL% -h %DBHOST% -P %DBPORT% %MYSQL_AUTH% %DBNAME% < "%SQLFILE%" 2>nul
+        if errorlevel 1 (
+            echo [ERROR] Failed to import database from %SQLFILE%.
+            pause
+            exit /b 1
+        )
+        echo [OK] Database imported.
+    ) else (
+        echo [OK] Database already has %TABLE_COUNT% tables and %CORE_DATA_COUNT% core records. Skipping import to keep existing data.
+    )
 )
 
 :: ---- Cap nhat datasource trong application.properties ----
