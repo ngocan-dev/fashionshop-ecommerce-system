@@ -16,9 +16,12 @@ export function AdminProductsFilters({
 }: Props) {
   const { data: categories = [] } = useCategoriesQuery();
 
-  const categoryTabs = [
+  const categoryTabs: Array<{ label: string; value: number | null }> = [
     { label: "All", value: null },
-    ...categories.map(c => ({ label: c.name, value: c.id }))
+    ...categories.map((c) => ({
+      label: c.name,
+      value: Number(c.id),
+    }))
   ];
 
   return (

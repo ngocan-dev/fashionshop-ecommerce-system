@@ -11,6 +11,37 @@ set BACKEND=%ROOT%fashionshop-backend
 set FRONTEND=%ROOT%fashionshop-frontend
 set SQLFILE=%ROOT%database\ecommerce_db.sql
 
+:: ---- Tim JDK 17 cho Backend ----
+set "JAVA17_HOME="
+if exist "C:\Program Files\Java\jdk-17\bin\java.exe" set "JAVA17_HOME=C:\Program Files\Java\jdk-17"
+
+if "%JAVA17_HOME%"=="" (
+    for /d %%D in ("C:\Program Files\Java\jdk-17*") do (
+        if exist "%%~fD\bin\java.exe" (
+            set "JAVA17_HOME=%%~fD"
+            goto :jdk17_found
+        )
+    )
+)
+
+if "%JAVA17_HOME%"=="" (
+    for /d %%D in ("C:\Program Files\Eclipse Adoptium\jdk-17*") do (
+        if exist "%%~fD\bin\java.exe" (
+            set "JAVA17_HOME=%%~fD"
+            goto :jdk17_found
+        )
+    )
+)
+
+if "%JAVA17_HOME%"=="" (
+    echo [ERROR] JDK 17 not found. Please install JDK 17 to run backend.
+    pause
+    exit /b 1
+)
+
+:jdk17_found
+echo [OK] Using JDK 17: %JAVA17_HOME%
+
 :: ---- Tim MySQL ----
 set MYSQL=mysql
 where mysql >nul 2>&1
@@ -42,8 +73,23 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-%MYSQL% -u root -p%DBPASS% ecommerce_db < "%SQLFILE%" 2>nul
-echo [OK] Database ready.
+
+set "TABLE_COUNT="
+for /f "usebackq delims=" %%T in (`%MYSQL% -u root -p%DBPASS% -N -B -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='ecommerce_db';" 2^>nul`) do set "TABLE_COUNT=%%T"
+if not defined TABLE_COUNT set "TABLE_COUNT=0"
+
+if "%TABLE_COUNT%"=="0" (
+    echo Database is empty. Importing initial schema and data...
+    %MYSQL% -u root -p%DBPASS% ecommerce_db < "%SQLFILE%" 2>nul
+    if errorlevel 1 (
+        echo [ERROR] Failed to import database from %SQLFILE%.
+        pause
+        exit /b 1
+    )
+    echo [OK] Database imported.
+) else (
+    echo [OK] Database already has %TABLE_COUNT% tables. Skipping import to keep existing data.
+)
 
 :: ---- Cap nhat mat khau trong application.properties ----
 powershell -Command "(Get-Content '%BACKEND%\src\main\resources\application.properties') -replace 'spring.datasource.password=.*', 'spring.datasource.password=%DBPASS%' | Set-Content '%BACKEND%\src\main\resources\application.properties'"
@@ -74,7 +120,7 @@ if not exist "%FRONTEND%\node_modules" (
 :: ---- Khoi dong Backend ----
 echo.
 echo [4/4] Starting Backend and Frontend...
-start "FashionShop Backend" cmd /k "title FashionShop Backend && cd /d "%BACKEND%" && echo Starting Backend... && mvnw spring-boot:run"
+start "FashionShop Backend" cmd /k "title FashionShop Backend && cd /d "%BACKEND%" && set "JAVA_HOME=%JAVA17_HOME%" && set "PATH=%JAVA_HOME%\bin;%PATH%" && echo Using JAVA_HOME=%JAVA_HOME% && echo Starting Backend... && mvnw spring-boot:run"
 
 :: Doi backend khoi dong truoc (30 giay)
 echo Waiting for Backend to start (30 seconds)...
