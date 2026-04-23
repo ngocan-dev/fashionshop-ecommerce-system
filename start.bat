@@ -60,14 +60,35 @@ if errorlevel 1 (
 )
 
 :: ---- Nhap mat khau MySQL ----
-echo Enter your MySQL root password:
+echo.
+echo Enter MySQL connection settings (same as MySQL Workbench)
+
+echo Host [localhost]:
+set /p DBHOST="> "
+if "%DBHOST%"=="" set "DBHOST=localhost"
+
+echo Port [3306]:
+set /p DBPORT="> "
+if "%DBPORT%"=="" set "DBPORT=3306"
+
+echo Username [root]:
+set /p DBUSER="> "
+if "%DBUSER%"=="" set "DBUSER=root"
+
+echo Schema/Database [ecommerce_db]:
+set /p DBNAME="> "
+if "%DBNAME%"=="" set "DBNAME=ecommerce_db"
+
+echo Password (leave blank if no password):
 set /p DBPASS="> "
-if "%DBPASS%"=="" set DBPASS=root
+
+set "MYSQL_AUTH=-u %DBUSER%"
+if not "%DBPASS%"=="" set "MYSQL_AUTH=-u %DBUSER% -p%DBPASS%"
 
 :: ---- Import database ----
 echo.
 echo [1/4] Creating database and importing data...
-%MYSQL% -u root -p%DBPASS% -e "CREATE DATABASE IF NOT EXISTS ecommerce_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>nul
+%MYSQL% -h %DBHOST% -P %DBPORT% %MYSQL_AUTH% -e "CREATE DATABASE IF NOT EXISTS %DBNAME% CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>nul
 if errorlevel 1 (
     echo [ERROR] Cannot connect to MySQL. Make sure MySQL is running and the password is correct.
     pause
@@ -75,12 +96,12 @@ if errorlevel 1 (
 )
 
 set "TABLE_COUNT="
-for /f "usebackq delims=" %%T in (`%MYSQL% -u root -p%DBPASS% -N -B -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='ecommerce_db';" 2^>nul`) do set "TABLE_COUNT=%%T"
+for /f "usebackq delims=" %%T in (`%MYSQL% -h %DBHOST% -P %DBPORT% %MYSQL_AUTH% -N -B -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='%DBNAME%';" 2^>nul`) do set "TABLE_COUNT=%%T"
 if not defined TABLE_COUNT set "TABLE_COUNT=0"
 
 if "%TABLE_COUNT%"=="0" (
     echo Database is empty. Importing initial schema and data...
-    %MYSQL% -u root -p%DBPASS% ecommerce_db < "%SQLFILE%" 2>nul
+    %MYSQL% -h %DBHOST% -P %DBPORT% %MYSQL_AUTH% %DBNAME% < "%SQLFILE%" 2>nul
     if errorlevel 1 (
         echo [ERROR] Failed to import database from %SQLFILE%.
         pause
@@ -91,8 +112,8 @@ if "%TABLE_COUNT%"=="0" (
     echo [OK] Database already has %TABLE_COUNT% tables. Skipping import to keep existing data.
 )
 
-:: ---- Cap nhat mat khau trong application.properties ----
-powershell -Command "(Get-Content '%BACKEND%\src\main\resources\application.properties') -replace 'spring.datasource.password=.*', 'spring.datasource.password=%DBPASS%' | Set-Content '%BACKEND%\src\main\resources\application.properties'"
+:: ---- Cap nhat datasource trong application.properties ----
+powershell -NoProfile -Command "$file='%BACKEND%\src\main\resources\application.properties'; $jdbc='jdbc:mysql://{0}:{1}/{2}?createDatabaseIfNotExist=true&allowZeroDatetime=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Ho_Chi_Minh&sessionVariables=sql_mode=''ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION''' -f $env:DBHOST,$env:DBPORT,$env:DBNAME; $content=Get-Content $file; $content=$content -replace '^spring\.datasource\.url=.*$',('spring.datasource.url='+$jdbc); $content=$content -replace '^spring\.datasource\.username=.*$',('spring.datasource.username='+$env:DBUSER); $content=$content -replace '^spring\.datasource\.password=.*$',('spring.datasource.password='+$env:DBPASS); Set-Content -Encoding UTF8 $file $content"
 
 :: ---- Tao .env.local cho frontend ----
 echo.
