@@ -8,12 +8,13 @@ import { clearSessionAndRedirect, useAuthSession } from '@/features/auth/store';
 const navigationByRole = {
   STAFF: [
     { href: '/staff/products', label: 'Products', icon: 'inventory_2' },
-    //{ href: '/staff/categories', label: 'Categories', icon: 'warehouse' },
+    { href: '/staff/categories', label: 'Categories', icon: 'warehouse' },
     { href: '/staff/orders', label: 'Orders', icon: 'shopping_bag' },
   ],
   ADMIN: [
     //{ href: '/admin/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { href: '/admin/products', label: 'Products', icon: 'inventory_2' },
+    { href: '/admin/categories', label: 'Categories', icon: 'warehouse' },
     { href: '/admin/orders', label: 'Orders', icon: 'shopping_bag' },
     { href: '/admin/customers', label: 'Customers', icon: 'group' },
     { href: '/admin/staff-accounts', label: 'Staff', icon: 'badge' },

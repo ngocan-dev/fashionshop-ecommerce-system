@@ -31,18 +31,27 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Category category = Category.builder()
-                .name(request.getName())
+                .name(request.getName().trim())
+                .description(normalizeOptional(request.getDescription()))
                 .createdBy(creator)
                 .build();
 
         Category saved = categoryRepository.save(category);
-        return CategoryResponse.builder().id(saved.getId()).name(saved.getName()).build();
+        return CategoryResponse.builder()
+                .id(saved.getId())
+                .name(saved.getName())
+                .description(saved.getDescription())
+                .build();
     }
 
     @Override
     public List<CategoryResponse> getAll() {
-        return categoryRepository.findAll().stream()
-                .map(c -> CategoryResponse.builder().id(c.getId()).name(c.getName()).build())
+        return categoryRepository.findByIsActiveTrueOrderByNameAsc().stream()
+                .map(c -> CategoryResponse.builder()
+                        .id(c.getId())
+                        .name(c.getName())
+                        .description(c.getDescription())
+                        .build())
                 .toList();
     }
 }
