@@ -73,8 +73,23 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-%MYSQL% -u root -p%DBPASS% ecommerce_db < "%SQLFILE%" 2>nul
-echo [OK] Database ready.
+
+set "TABLE_COUNT="
+for /f "usebackq delims=" %%T in (`%MYSQL% -u root -p%DBPASS% -N -B -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='ecommerce_db';" 2^>nul`) do set "TABLE_COUNT=%%T"
+if not defined TABLE_COUNT set "TABLE_COUNT=0"
+
+if "%TABLE_COUNT%"=="0" (
+    echo Database is empty. Importing initial schema and data...
+    %MYSQL% -u root -p%DBPASS% ecommerce_db < "%SQLFILE%" 2>nul
+    if errorlevel 1 (
+        echo [ERROR] Failed to import database from %SQLFILE%.
+        pause
+        exit /b 1
+    )
+    echo [OK] Database imported.
+) else (
+    echo [OK] Database already has %TABLE_COUNT% tables. Skipping import to keep existing data.
+)
 
 :: ---- Cap nhat mat khau trong application.properties ----
 powershell -Command "(Get-Content '%BACKEND%\src\main\resources\application.properties') -replace 'spring.datasource.password=.*', 'spring.datasource.password=%DBPASS%' | Set-Content '%BACKEND%\src\main\resources\application.properties'"
