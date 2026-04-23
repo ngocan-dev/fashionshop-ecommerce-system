@@ -37,7 +37,7 @@ public class HomeServiceImpl implements HomeService {
                     .toList();
 
             List<HomeProductDto> newArrivals = productRepository
-                    .findByIsActiveTrueOrderByCreatedAtDesc(PageRequest.of(0, 8))
+                    .findByIsActiveTrueOrderByCreatedAtDesc(PageRequest.of(0, 3))
                     .stream()
                     .map(this::toHomeProduct)
                     .toList();

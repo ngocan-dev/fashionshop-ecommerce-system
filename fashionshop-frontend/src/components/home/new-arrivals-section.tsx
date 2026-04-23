@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useHomeQuery } from '@/features/home/hooks';
 
 const ALL_FILTER = 'ALL';
+const MAX_NEW_ARRIVALS = 3;
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-US', {
@@ -30,10 +31,12 @@ export function NewArrivalsSection() {
 
   const visibleArrivals = useMemo(() => {
     if (activeCategory === ALL_FILTER) {
-      return arrivals;
+      return arrivals.slice(0, MAX_NEW_ARRIVALS);
     }
 
-    return arrivals.filter((item) => item.categoryName === activeCategory);
+    return arrivals
+      .filter((item) => item.categoryName === activeCategory)
+      .slice(0, MAX_NEW_ARRIVALS);
   }, [activeCategory, arrivals]);
 
   if (!isLoading && arrivals.length === 0) {
