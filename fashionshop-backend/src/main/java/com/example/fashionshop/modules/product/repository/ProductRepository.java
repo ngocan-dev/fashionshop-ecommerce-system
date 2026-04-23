@@ -15,6 +15,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Page<Product> findByIsActiveTrueOrderByCreatedAtDesc(Pageable pageable);
 
+    Page<Product> findByIsActiveTrueAndCategoryIdOrderByCreatedAtDesc(Integer categoryId, Pageable pageable);
+
     Page<Product> findByIsActiveTrueAndNameContainingIgnoreCase(String keyword, Pageable pageable);
 
     Page<Product> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
@@ -49,6 +51,35 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             p.createdAt DESC
             """)
     Page<Product> searchActiveProductsByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+            SELECT p
+            FROM Product p
+            JOIN p.category c
+            WHERE p.isActive = true
+              AND (
+                LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR (p.description IS NOT NULL AND LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              )
+            ORDER BY p.createdAt DESC
+            """)
+    Page<Product> findStoreProductsByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+            SELECT p
+            FROM Product p
+            JOIN p.category c
+            WHERE p.isActive = true
+              AND c.id = :categoryId
+              AND (
+                LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR (p.description IS NOT NULL AND LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              )
+            ORDER BY p.createdAt DESC
+            """)
+    Page<Product> findStoreProductsByKeywordAndCategory(@Param("keyword") String keyword, @Param("categoryId") Integer categoryId, Pageable pageable);
 
     @Query("SELECT p FROM Product p JOIN FETCH p.category WHERE p.isFeatured = true AND p.isActive = true ORDER BY p.createdAt DESC")
     List<Product> findTop8FeaturedActiveWithCategory(Pageable pageable);

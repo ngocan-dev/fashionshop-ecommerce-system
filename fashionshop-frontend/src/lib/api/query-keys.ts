@@ -5,7 +5,7 @@ export const queryKeys = {
   categories: ['categories'] as const,
   products: ['products'] as const,
   product: (idOrSlug: string) => ['products', idOrSlug] as const,
-  storeProducts: ['store', 'products'] as const,
+  storeProducts: (filter?: unknown) => ['store', 'products', filter ?? {}] as const,
   cart: ['cart'] as const,
   cartSummary: ['cart', 'summary'] as const,
   wishlist: ['wishlist'] as const,

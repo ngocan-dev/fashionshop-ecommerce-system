@@ -6,9 +6,10 @@ type ProductGridProps = {
   visibleCount: number;
   onLoadMore: () => void;
   hasMore: boolean;
+  isLoadingMore?: boolean;
 };
 
-export function ProductGrid({ products, visibleCount, onLoadMore, hasMore }: ProductGridProps) {
+export function ProductGrid({ products, visibleCount, onLoadMore, hasMore, isLoadingMore = false }: ProductGridProps) {
   const visibleProducts = products.slice(0, visibleCount);
 
   return (
@@ -24,9 +25,10 @@ export function ProductGrid({ products, visibleCount, onLoadMore, hasMore }: Pro
           <button
             type="button"
             onClick={onLoadMore}
+            disabled={isLoadingMore}
             className="h-12 min-w-[220px] border border-zinc-900 bg-zinc-950 px-6 text-xs font-semibold uppercase tracking-[0.3em] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-zinc-800"
           >
-            Load More Products
+            {isLoadingMore ? 'Loading...' : 'Load More Products'}
           </button>
         </div>
       ) : null}

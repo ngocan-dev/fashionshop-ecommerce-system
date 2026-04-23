@@ -1,5 +1,5 @@
 import { api, apiRequest } from '@/lib/api/http';
-import type { ApiResponse, ApiListResponse } from '@/lib/api/types';
+import type { ApiResponse } from '@/lib/api/types';
 import type { Product, ProductFilter, UpsertProductRequest } from '@/types/product';
 import { allMockProducts, getMockProduct, addMockProduct } from '@/data/mock-data';
 
@@ -221,10 +221,9 @@ type StorePaginatedResponse = {
   totalPages: number;
 };
 
-export async function fetchStoreProducts(filter?: ProductFilter): Promise<StoreProductSummary[]> {
+export async function fetchStoreProducts(filter?: ProductFilter): Promise<StorePaginatedResponse> {
   const response = await api.get<ApiResponse<StorePaginatedResponse>>('/api/store/products', { params: filter });
-  const paginated = await apiRequest(Promise.resolve(response));
-  return paginated.items;
+  return apiRequest(Promise.resolve(response));
 }
 
 export async function fetchStoreProduct(idOrSlug: string) {

@@ -6,6 +6,7 @@ import { ProductGrid } from '@/components/products/listing/product-grid';
 import { ProductToolbar } from '@/components/products/listing/product-toolbar';
 import type { ProductListingItem, ProductSortOption } from '@/components/products/listing/types';
 import { useStoreProductsQuery } from '@/features/products/hooks';
+import { useCategoriesQuery } from '@/features/categories/hooks';
 
 function sortProducts(products: ProductListingItem[], sortBy: ProductSortOption) {
   const list = [...products];
@@ -16,11 +17,42 @@ function sortProducts(products: ProductListingItem[], sortBy: ProductSortOption)
 }
 
 export default function ProductsPage() {
-  const { data: storeProducts, isPending } = useStoreProductsQuery();
+  const PAGE_SIZE = 20;
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All Products');
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  const [priceRange, setPriceRange] = useState(2000);
+  const [sortBy, setSortBy] = useState<ProductSortOption>('Newest Arrivals');
+  const categoriesQuery = useCategoriesQuery();
+
+  const selectedCategoryId = useMemo(() => {
+    if (selectedCategory === 'All Products') return undefined;
+    const matched = categoriesQuery.data?.find((category) => category.name === selectedCategory);
+    return matched ? Number(matched.id) : undefined;
+  }, [categoriesQuery.data, selectedCategory]);
+
+  const {
+    data: storeProducts,
+    isPending,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useStoreProductsQuery({
+    keyword: searchTerm.trim() || undefined,
+    categoryId: selectedCategoryId,
+    size: PAGE_SIZE,
+  });
+
+  const storeItems = useMemo(
+    () => storeProducts?.pages.flatMap((page) => page.items) ?? [],
+    [storeProducts],
+  );
+
+  const totalResults = storeProducts?.pages[0]?.totalItems ?? 0;
 
   const productCatalog: ProductListingItem[] = useMemo(() => {
-    if (!storeProducts) return [];
-    return storeProducts.map((item) => ({
+    return storeItems.map((item) => ({
       id: String(item.id),
       name: item.name,
       category: item.categoryName ?? 'Other',
@@ -30,31 +62,20 @@ export default function ProductsPage() {
       color: 'black',
       size: 'M',
     }));
-  }, [storeProducts]);
+  }, [storeItems]);
 
-  const categories = useMemo(() => [...new Set(productCatalog.map((p) => p.category))], [productCatalog]);
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All Products');
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-  const [priceRange, setPriceRange] = useState(2000);
-  const [sortBy, setSortBy] = useState<ProductSortOption>('Newest Arrivals');
-  const [visibleCount, setVisibleCount] = useState(6);
+  const categories = useMemo(
+    () => categoriesQuery.data?.map((category) => category.name) ?? [...new Set(productCatalog.map((p) => p.category))],
+    [categoriesQuery.data, productCatalog],
+  );
 
   const filteredProducts = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase();
     const filtered = productCatalog.filter((product) => {
-      const matchesSearch = !keyword || [product.name, product.category].some((v) => v.toLowerCase().includes(keyword));
-      const matchesCategory = selectedCategory === 'All Products' || product.category === selectedCategory;
       const matchesPrice = product.price <= priceRange;
-      return matchesSearch && matchesCategory && matchesPrice;
+      return matchesPrice;
     });
     return sortProducts(filtered, sortBy);
-  }, [priceRange, searchTerm, selectedCategory, sortBy, productCatalog]);
-
-  const visibleProducts = useMemo(() => filteredProducts.slice(0, visibleCount), [filteredProducts, visibleCount]);
-  const hasMore = visibleCount < filteredProducts.length;
+  }, [priceRange, sortBy, productCatalog]);
 
   return (
     <main className="min-h-screen bg-[#f6f6f3] text-zinc-900">
@@ -67,20 +88,20 @@ export default function ProductsPage() {
               selectedColor={selectedColor}
               priceRange={priceRange}
               categories={categories}
-              onCategoryChange={(value) => { setSelectedCategory(value); setVisibleCount(6); }}
-              onSizeChange={(value) => { setSelectedSize(value); setVisibleCount(6); }}
-              onColorChange={(value) => { setSelectedColor(value); setVisibleCount(6); }}
-              onPriceChange={(value) => { setPriceRange(value); setVisibleCount(6); }}
+              onCategoryChange={setSelectedCategory}
+              onSizeChange={setSelectedSize}
+              onColorChange={setSelectedColor}
+              onPriceChange={setPriceRange}
             />
           </div>
 
           <section className="space-y-8 pt-1">
             <ProductToolbar
               searchTerm={searchTerm}
-              resultCount={filteredProducts.length}
+              resultCount={totalResults}
               sortBy={sortBy}
-              onSearchChange={(value) => { setSearchTerm(value); setVisibleCount(6); }}
-              onSortChange={(value) => { setSortBy(value); setVisibleCount(6); }}
+              onSearchChange={setSearchTerm}
+              onSortChange={setSortBy}
             />
 
             {isPending ? (
@@ -89,10 +110,11 @@ export default function ProductsPage() {
               </div>
             ) : filteredProducts.length > 0 ? (
               <ProductGrid
-                products={visibleProducts}
-                visibleCount={visibleCount}
-                onLoadMore={() => setVisibleCount((c) => Math.min(c + 6, filteredProducts.length))}
-                hasMore={hasMore}
+                products={filteredProducts}
+                visibleCount={filteredProducts.length}
+                onLoadMore={() => fetchNextPage()}
+                hasMore={Boolean(hasNextPage)}
+                isLoadingMore={isFetchingNextPage}
               />
             ) : (
               <div className="flex min-h-[20rem] items-center justify-center border border-dashed border-zinc-300 bg-white/60 text-sm uppercase tracking-[0.22em] text-zinc-400">

@@ -29,8 +29,10 @@ public class StoreProductController {
     @GetMapping
     public ApiResponse<PaginationResponse<StoreProductSummaryResponse>> browse(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size) {
-        PaginationResponse<StoreProductSummaryResponse> response = productService.getStoreProducts(page, size);
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer categoryId) {
+        PaginationResponse<StoreProductSummaryResponse> response = productService.getStoreProducts(page, size, keyword, categoryId);
         String message = response.getItems().isEmpty() ? "No products available" : "Products fetched successfully";
         return ApiResponse.success(message, response);
     }

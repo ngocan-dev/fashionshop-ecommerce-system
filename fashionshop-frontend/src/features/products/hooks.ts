@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createProduct, deleteManageProduct, deleteProduct, fetchManageProduct, fetchManageProducts, fetchProduct, fetchProducts, fetchStoreProduct, fetchStoreProducts, searchProducts, updateManageProduct, updateProduct } from './services';
 import { queryKeys } from '@/lib/api/query-keys';
 import type { ProductFilter } from '@/types/product';
@@ -17,8 +17,18 @@ export function useProductSearchQuery(keyword: string) {
   return useQuery({ queryKey: [...queryKeys.products, 'search', keyword], queryFn: () => searchProducts(keyword), enabled: Boolean(keyword) });
 }
 
-export function useStoreProductsQuery() {
-  return useQuery({ queryKey: queryKeys.storeProducts, queryFn: () => fetchStoreProducts() });
+export function useStoreProductsQuery(filter?: ProductFilter) {
+  const pageSize = filter?.size ?? 12;
+
+  return useInfiniteQuery({
+    queryKey: queryKeys.storeProducts(filter),
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) => fetchStoreProducts({ ...filter, page: pageParam, size: pageSize }),
+    getNextPageParam: (lastPage) => {
+      const nextPage = lastPage.page + 1;
+      return nextPage < lastPage.totalPages ? nextPage : undefined;
+    },
+  });
 }
 
 export function useStoreProductQuery(idOrSlug: string) {
@@ -42,7 +52,7 @@ export function useCreateProductMutation() {
     mutationFn: createProduct,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.products });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.storeProducts });
+      await queryClient.invalidateQueries({ queryKey: ['store', 'products'] });
     },
   });
 }

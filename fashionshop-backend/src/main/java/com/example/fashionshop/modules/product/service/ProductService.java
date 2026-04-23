@@ -29,7 +29,7 @@ public interface ProductService {
 
     PaginationResponse<ProductResponse> getProducts(int page, int size, String keyword);
 
-    PaginationResponse<StoreProductSummaryResponse> getStoreProducts(int page, int size);
+    PaginationResponse<StoreProductSummaryResponse> getStoreProducts(int page, int size, String keyword, Integer categoryId);
 
     StoreProductDetailResponse getStoreProductDetail(String idOrSlug);
 
