@@ -113,6 +113,9 @@ export async function fetchAdminCustomerAccounts() {
   const raw = await apiRequest(Promise.resolve(response));
   return Array.isArray(raw) ? raw.map((c: any) => ({
     ...c,
+    id: String(c.id),
+    fullName: c.fullName ?? '',
+    email: c.email ?? '',
     isActive: c.status === 'ACTIVE',
     totalOrders: c.totalOrders || 0,
     totalSpend: c.totalSpend || 0,

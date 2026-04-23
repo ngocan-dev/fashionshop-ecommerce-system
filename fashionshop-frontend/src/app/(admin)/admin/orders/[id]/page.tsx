@@ -1,13 +1,20 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useManageOrderQuery, useUpdateManageOrderStatusMutation } from '@/features/orders/hooks';
+import { useAdminCustomerAccountsQuery } from '@/features/users/hooks';
 import { LoadingState } from '@/components/common/loading-state';
 import { EmptyState } from '@/components/common/empty-state';
+import * as Dialog from '@radix-ui/react-dialog';
+import { DialogClose, DialogContent, DialogRoot } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils/cn';
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
 
 export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
@@ -15,15 +22,38 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
   const { id } = unwrappedParams;
 
   const { data: order, isLoading } = useManageOrderQuery(id);
+  const { data: customers = [] } = useAdminCustomerAccountsQuery();
   const statusMutation = useUpdateManageOrderStatusMutation(id);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const customerProfile = customers.find((customer) => customer.email === order?.customerEmail);
+  const customerInitials = (order?.customerName || 'Customer')
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+  const memberSince = order?.createdAt
+    ? new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : 'Unknown';
 
   const handleCancelOrder = () => {
     statusMutation.mutate('CANCELLED', {
       onSuccess: () => {
         toast.success('Order cancelled successfully');
       },
-      onError: (err: any) => {
-        toast.error(err.message || 'Failed to cancel order');
+      onError: (error: unknown) => {
+        toast.error(getErrorMessage(error, 'Failed to cancel order'));
+      }
+    });
+  };
+
+  const handleShipItems = () => {
+    statusMutation.mutate('CONFIRMED', {
+      onSuccess: () => {
+        toast.success('Order confirmed successfully');
+      },
+      onError: (error: unknown) => {
+        toast.error(getErrorMessage(error, 'Failed to confirm order'));
       }
     });
   };
@@ -50,6 +80,7 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
   }
 
   const isCancelled = order.status === 'CANCELLED';
+  const isConfirmed = order.status === 'CONFIRMED';
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -87,14 +118,15 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
             {statusMutation.isPending ? 'Processing...' : isCancelled ? 'Order Cancelled' : 'Cancel Order'}
           </button>
           <button
-            disabled={isCancelled || statusMutation.isPending}
+            onClick={handleShipItems}
+            disabled={isCancelled || isConfirmed || statusMutation.isPending}
             className={cn(
               "px-8 py-3 bg-black text-white text-xs font-bold uppercase tracking-widest hover:scale-105 active:opacity-80 transition-all rounded-md flex items-center gap-2",
-              isCancelled && "opacity-20 grayscale cursor-not-allowed"
+              (isCancelled || isConfirmed) && "opacity-20 grayscale cursor-not-allowed"
             )}
           >
             <span className="material-symbols-outlined text-sm">local_shipping</span>
-            Ship Items
+            {statusMutation.isPending ? 'Processing...' : isConfirmed ? 'Order Confirmed' : 'Ship Items'}
           </button>
         </div>
       </section>
@@ -229,7 +261,11 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
                 <span className="text-sm font-bold text-black">{order.customerTotalOrders} Orders</span>
               </div>
             )}
-            <button className="w-full mt-6 py-3 border border-neutral-200 text-[10px] font-bold uppercase tracking-widest hover:border-black hover:bg-black hover:text-white transition-all rounded-md">
+            <button
+              type="button"
+              onClick={() => setIsProfileOpen(true)}
+              className="w-full mt-6 py-3 border border-neutral-200 text-[10px] font-bold uppercase tracking-widest hover:border-black hover:bg-black hover:text-white transition-all rounded-md"
+            >
               View Full Profile
             </button>
           </section>
@@ -298,6 +334,110 @@ export default function AdminOrderDetailsPage({ params }: { params: Promise<{ id
           </div>
         </div>
       </div>
+
+      <DialogRoot open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+        <DialogContent className="w-[min(92vw,720px)] overflow-hidden rounded-[2rem] border border-neutral-200 bg-white p-0">
+          <Dialog.Title className="sr-only">
+            Customer profile for {order.customerName || 'selected customer'}
+          </Dialog.Title>
+          <div className="relative bg-black px-8 py-10 text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.16),_transparent_35%)]" />
+            <div className="relative flex items-start justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-white/15 bg-white/10">
+                  {order.customerAvatar ? (
+                    <Image src={order.customerAvatar} alt={order.customerName || 'Customer'} fill className="object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xl font-black tracking-widest">
+                      {customerInitials}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-white/60">Customer Profile</p>
+                  <h3 className="mt-2 text-3xl font-headline font-black tracking-tight">
+                    {order.customerName || 'Unknown Customer'}
+                  </h3>
+                  <p className="mt-2 text-sm text-white/70">{order.customerEmail || 'No email provided'}</p>
+                </div>
+              </div>
+              <DialogClose className="rounded-full border border-white/15 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.24em] text-white/80 transition-colors hover:bg-white/10 hover:text-white">
+                Close
+              </DialogClose>
+            </div>
+          </div>
+
+          <div className="grid gap-6 p-8 md:grid-cols-2">
+            <section className="rounded-3xl border border-neutral-100 bg-surface-container-lowest p-6">
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-neutral-400">Contact</p>
+              <div className="mt-5 space-y-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Email</p>
+                  <p className="mt-1 text-sm font-medium text-black">{order.customerEmail || 'No email provided'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Phone</p>
+                  <p className="mt-1 text-sm font-medium text-black">{order.customerPhone || customerProfile?.phoneNumber || 'No phone provided'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Status</p>
+                  <p className="mt-1 text-sm font-medium text-black">
+                    {customerProfile?.isActive === false ? 'Inactive' : 'Active'}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-3xl border border-neutral-100 bg-surface-container-lowest p-6">
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-neutral-400">Customer Snapshot</p>
+              <div className="mt-5 grid grid-cols-2 gap-4">
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-neutral-400">Orders</p>
+                  <p className="mt-3 text-2xl font-black tracking-tight text-black">
+                    {customerProfile?.totalOrders ?? order.customerTotalOrders ?? 1}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-neutral-400">Spend</p>
+                  <p className="mt-3 text-2xl font-black tracking-tight text-black">
+                    ${Number(customerProfile?.totalSpend ?? order.total ?? 0).toLocaleString()}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-neutral-400">Points</p>
+                  <p className="mt-3 text-2xl font-black tracking-tight text-black">
+                    {customerProfile?.loyaltyPoints ?? 0}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-neutral-400">Since</p>
+                  <p className="mt-3 text-sm font-bold uppercase tracking-wider text-black">
+                    {memberSince}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-3xl border border-neutral-100 bg-surface-container-lowest p-6 md:col-span-2">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-neutral-400">Shipping Preference</p>
+                  <h4 className="mt-2 text-lg font-bold tracking-tight text-black">Latest delivery details</h4>
+                </div>
+                <span className="rounded-full bg-black px-4 py-2 text-[10px] font-bold uppercase tracking-[0.24em] text-white">
+                  Order #{order.orderNumber || order.id}
+                </span>
+              </div>
+              <div className="mt-5 rounded-2xl bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Address</p>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-700">
+                  {order.shippingAddress || 'No shipping address provided for this order.'}
+                </p>
+              </div>
+            </section>
+          </div>
+        </DialogContent>
+      </DialogRoot>
     </div>
   );
 }

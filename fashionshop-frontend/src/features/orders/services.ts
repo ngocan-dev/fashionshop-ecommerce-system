@@ -6,6 +6,25 @@ import { mockOrders, getMockOrder, mockCart } from '@/data/mock-data';
 
 const USE_MOCK = false;
 
+function normalizeOrderStatus(value: unknown): Order['status'] {
+  if (typeof value !== 'string' || !value.trim()) {
+    return 'PENDING';
+  }
+
+  const normalized = value.trim().toUpperCase();
+  switch (normalized) {
+    case 'PENDING':
+    case 'CONFIRMED':
+    case 'PROCESSING':
+    case 'SHIPPED':
+    case 'DELIVERED':
+    case 'COMPLETED':
+    case 'CANCELLED':
+      return normalized;
+    default:
+      return 'PENDING';
+  }
+}
 
 function normalizeOrderItem(raw: any): OrderSummaryItem {
   const price = raw.price ?? raw.unitPrice ?? 0;
@@ -22,19 +41,48 @@ function normalizeOrderItem(raw: any): OrderSummaryItem {
 
 function normalizeOrder(raw: any): Order {
   const summary = raw.summary || {};
+  const customer = raw.customer || {};
+  const additionalInfo = raw.additionalInfo || {};
+  const rawStatus = raw.status || raw.orderStatus || raw.currentStatus || summary.orderStatus;
   
   return {
     ...raw,
     id: raw.id ? String(raw.id) : (raw.orderId ? String(raw.orderId) : (summary.orderId ? String(summary.orderId) : raw.orderCode)),
-    customerName: raw.customerName || raw.receiverName || summary.customerName || '',
-    status: raw.status || raw.orderStatus || raw.currentStatus || summary.orderStatus || 'PENDING',
-    createdAt: raw.createdAt || raw.orderDate || summary.orderDate || new Date().toISOString(),
+    customerName: raw.customerName || raw.receiverName || summary.customerName || customer.fullName || '',
+    customerEmail: raw.customerEmail || summary.customerEmail || customer.email || '',
+    customerPhone: raw.customerPhone || summary.customerPhone || customer.phoneNumber || raw.phone || '',
+    status: normalizeOrderStatus(rawStatus),
+    createdAt: raw.createdAt || raw.orderDate || summary.orderDate || additionalInfo.createdAt || new Date().toISOString(),
     total: raw.total ?? raw.totalAmount ?? summary.totalAmount ?? raw.totalPrice ?? 0,
     subtotal: raw.subtotal ?? summary.subtotal ?? raw.totalPrice ?? 0,
     shippingFee: raw.shippingFee ?? summary.shippingFee ?? 0,
     discount: raw.discount ?? raw.discountAmount ?? summary.discountAmount ?? 0,
+    shippingAddress: raw.shippingAddress ?? customer.shippingAddress ?? '',
+    note: raw.note ?? raw.customerNote ?? additionalInfo.customerNote ?? '',
     items: Array.isArray(raw.items) ? raw.items.map(normalizeOrderItem) : [],
   };
+}
+
+function filterOrders(orders: Order[], filter?: OrderFilter): Order[] {
+  let filteredItems = [...orders];
+
+  if (filter?.keyword) {
+    const keyword = filter.keyword.trim().toLowerCase();
+    if (keyword) {
+      filteredItems = filteredItems.filter((order) =>
+        order.orderNumber?.toLowerCase().includes(keyword) ||
+        order.customerName?.toLowerCase().includes(keyword) ||
+        order.customerEmail?.toLowerCase().includes(keyword) ||
+        order.id.toLowerCase().includes(keyword),
+      );
+    }
+  }
+
+  if (filter?.status) {
+    filteredItems = filteredItems.filter((order) => order.status === filter.status);
+  }
+
+  return filteredItems;
 }
 
 function normalizeCheckoutSummary(raw: any): CheckoutSummary {
@@ -135,20 +183,7 @@ export async function fetchOrders() {
 
 export async function fetchManageOrders(filter?: OrderFilter) {
   if (USE_MOCK) {
-    let filteredItems = [...mockOrders];
-
-    if (filter?.keyword) {
-      const k = filter.keyword.toLowerCase();
-      filteredItems = filteredItems.filter(o =>
-        o.orderNumber?.toLowerCase().includes(k) ||
-        o.customerName?.toLowerCase().includes(k) ||
-        o.id.toLowerCase().includes(k)
-      );
-    }
-
-    if (filter?.status) {
-      filteredItems = filteredItems.filter(o => o.status === filter.status);
-    }
+    let filteredItems = filterOrders(mockOrders, filter);
 
     const page = filter?.page ?? 0;
     const size = filter?.size ?? 10;
@@ -158,14 +193,29 @@ export async function fetchManageOrders(filter?: OrderFilter) {
     return {
       items: paginatedItems,
       total: filteredItems.length,
+      totalItems: filteredItems.length,
+      totalPages: Math.ceil(filteredItems.length / size),
       page,
       size,
     };
   }
-  const response = await api.get<ApiResponse<any>>('/api/orders', { params: filter });
+
+  const response = await api.get<ApiResponse<any[]>>('/api/orders/manage');
   const raw = await apiRequest(Promise.resolve(response));
-  if (raw && Array.isArray(raw.items)) return { ...raw, items: raw.items.map(normalizeOrder) };
-  return raw;
+  const normalizedOrders = Array.isArray(raw) ? raw.map(normalizeOrder) : [];
+  const filteredItems = filterOrders(normalizedOrders, filter);
+  const page = filter?.page ?? 0;
+  const size = filter?.size ?? 10;
+  const start = page * size;
+
+  return {
+    items: filteredItems.slice(start, start + size),
+    total: filteredItems.length,
+    totalItems: filteredItems.length,
+    totalPages: Math.ceil(filteredItems.length / size),
+    page,
+    size,
+  };
 }
 
 export async function fetchManageOrder(orderId: string) {

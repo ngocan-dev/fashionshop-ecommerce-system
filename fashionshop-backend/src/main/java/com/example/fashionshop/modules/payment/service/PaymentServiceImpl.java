@@ -74,11 +74,9 @@ public class PaymentServiceImpl implements PaymentService {
                     .idempotencyKey(idempotencyKey)
                     .build());
 
-            order.setStatus(OrderStatus.CONFIRMED);
-            orderRepository.save(order);
             updateInvoiceStatus(order, InvoicePaymentStatus.PENDING);
 
-            return toResponse(payment, order, "Order confirmed with cash on delivery", false, null);
+            return toResponse(payment, order, "Cash on delivery selected", false, null);
         }
 
         // Gateway flow
@@ -119,8 +117,6 @@ public class PaymentServiceImpl implements PaymentService {
         processing.setGatewayTransactionId(result.getTransactionId());
         paymentRepository.save(processing);
 
-        order.setStatus(OrderStatus.CONFIRMED);
-        orderRepository.save(order);
         updateInvoiceStatus(order, InvoicePaymentStatus.PAID);
 
         return toResponse(processing, order, "Payment successful", false, result.getRedirectUrl());

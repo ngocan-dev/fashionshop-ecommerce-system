@@ -248,7 +248,7 @@ public class OrderServiceImpl implements OrderService {
 
             Order order = orderRepository.save(Order.builder()
                     .user(user)
-                    .status(selectedPaymentMethod == PaymentMethod.COD ? OrderStatus.CONFIRMED : OrderStatus.PENDING)
+                    .status(OrderStatus.PENDING)
                     .totalPrice(finalTotal)
                     .receiverName(request.getReceiverName())
                     .phone(request.getPhone())
