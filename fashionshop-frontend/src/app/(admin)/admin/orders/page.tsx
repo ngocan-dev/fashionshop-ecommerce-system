@@ -39,8 +39,8 @@ export default function AdminOrdersPage() {
   });
 
   const orders: Order[] = response?.items ?? [];
-  const totalItems = response?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const totalItems = response?.totalItems ?? response?.total ?? 0;
+  const totalPages = Math.max(1, response?.totalPages ?? Math.ceil(totalItems / pageSize));
 
   const pendingCount = orders.filter(o => o.status === 'PENDING').length;
 

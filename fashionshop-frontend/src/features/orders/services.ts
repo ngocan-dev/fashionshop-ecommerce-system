@@ -200,21 +200,24 @@ export async function fetchManageOrders(filter?: OrderFilter) {
     };
   }
 
-  const response = await api.get<ApiResponse<any[]>>('/api/orders/manage');
+  const response = await api.get<ApiResponse<any>>('/api/orders', { params: filter });
   const raw = await apiRequest(Promise.resolve(response));
-  const normalizedOrders = Array.isArray(raw) ? raw.map(normalizeOrder) : [];
-  const filteredItems = filterOrders(normalizedOrders, filter);
-  const page = filter?.page ?? 0;
-  const size = filter?.size ?? 10;
-  const start = page * size;
+  if (raw && Array.isArray(raw.items)) {
+    return {
+      ...raw,
+      total: raw.total ?? raw.totalItems ?? 0,
+      totalItems: raw.totalItems ?? raw.total ?? 0,
+      items: raw.items.map(normalizeOrder),
+    };
+  }
 
   return {
-    items: filteredItems.slice(start, start + size),
-    total: filteredItems.length,
-    totalItems: filteredItems.length,
-    totalPages: Math.ceil(filteredItems.length / size),
-    page,
-    size,
+    items: [],
+    total: 0,
+    totalItems: 0,
+    totalPages: 0,
+    page: filter?.page ?? 0,
+    size: filter?.size ?? 10,
   };
 }
 
