@@ -15,4 +15,5 @@ export type AuthUser = {
   phoneNumber?: string;
   avatarUrl?: string;
   isActive?: boolean;
+  accountStatus?: 'ACTIVE' | 'LOCKED' | 'DELETED';
 };

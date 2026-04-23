@@ -1,5 +1,6 @@
 package com.example.fashionshop.security.service;
 
+import com.example.fashionshop.common.enums.AccountStatus;
 import com.example.fashionshop.modules.user.entity.User;
 import com.example.fashionshop.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +26,16 @@ public class CustomUserDetailsService implements UserDetailsService {
                 System.out.println("[WARN] User not found with email: " + username);
                 return new UsernameNotFoundException("User not found with email: " + username);
             });
+        AccountStatus accountStatus = user.getAccountStatus() == null
+                ? (Boolean.TRUE.equals(user.getIsActive()) ? AccountStatus.ACTIVE : AccountStatus.LOCKED)
+                : user.getAccountStatus();
         return new org.springframework.security.core.userdetails.User(
             user.getEmail(),
             user.getPassword(),
-            Boolean.TRUE.equals(user.getIsActive()),
+            accountStatus != AccountStatus.DELETED,
             true,
             true,
-            true,
+            accountStatus != AccountStatus.LOCKED,
             List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }

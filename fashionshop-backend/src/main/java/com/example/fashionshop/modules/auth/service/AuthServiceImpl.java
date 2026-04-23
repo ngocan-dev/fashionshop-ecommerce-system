@@ -1,7 +1,9 @@
 package com.example.fashionshop.modules.auth.service;
 
+import com.example.fashionshop.common.enums.AccountStatus;
 import com.example.fashionshop.common.enums.Role;
 import com.example.fashionshop.common.exception.AccountCreationException;
+import com.example.fashionshop.common.exception.AuthStatusException;
 import com.example.fashionshop.common.exception.AuthenticationSystemException;
 import com.example.fashionshop.common.exception.BadRequestException;
 import com.example.fashionshop.common.exception.UnauthorizedException;
@@ -48,6 +50,7 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.CUSTOMER)
                 .isActive(true)
+                .accountStatus(AccountStatus.ACTIVE)
                 .build();
 
         try {
@@ -69,6 +72,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(LoginRequest request) {
         try {
+            userRepository.findByEmail(request.getEmail()).ifPresent(this::validateLoginEligibility);
+
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
@@ -84,8 +89,10 @@ public class AuthServiceImpl implements AuthService {
                     .email(user.getEmail())
                     .role(user.getRole())
                     .build();
+        } catch (AuthStatusException ex) {
+            throw ex;
         } catch (AuthenticationException ex) {
-            throw new UnauthorizedException("Invalid email or password");
+            throw new AuthStatusException("INVALID_CREDENTIALS", "Sai tài khoản hoặc mật khẩu");
         } catch (Exception ex) {
             throw new AuthenticationSystemException("Login failed, please try again later");
         }
@@ -119,5 +126,19 @@ public class AuthServiceImpl implements AuthService {
             return email.substring(0, delimiterIndex);
         }
         return email;
+    }
+
+    private void validateLoginEligibility(User user) {
+        AccountStatus accountStatus = user.getAccountStatus() == null
+                ? (Boolean.TRUE.equals(user.getIsActive()) ? AccountStatus.ACTIVE : AccountStatus.LOCKED)
+                : user.getAccountStatus();
+
+        if (accountStatus == AccountStatus.DELETED) {
+            throw new AuthStatusException("ACCOUNT_DELETED", "Tài khoản đã bị xóa");
+        }
+
+        if (accountStatus == AccountStatus.LOCKED) {
+            throw new AuthStatusException("ACCOUNT_LOCKED", "Tài khoản đã bị khóa");
+        }
     }
 }

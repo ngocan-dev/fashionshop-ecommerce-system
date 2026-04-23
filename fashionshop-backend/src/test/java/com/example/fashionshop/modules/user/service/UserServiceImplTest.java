@@ -1,7 +1,9 @@
 package com.example.fashionshop.modules.user.service;
 
+import com.example.fashionshop.common.enums.AccountStatus;
 import com.example.fashionshop.common.enums.Role;
 import com.example.fashionshop.common.exception.BadRequestException;
+import com.example.fashionshop.modules.order.repository.OrderRepository;
 import com.example.fashionshop.modules.user.dto.CreateStaffRequest;
 import com.example.fashionshop.modules.user.dto.UpdateProfileRequest;
 import com.example.fashionshop.modules.user.dto.UserResponse;
@@ -35,6 +37,9 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private OrderRepository orderRepository;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -48,7 +53,7 @@ class UserServiceImplTest {
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken("admin@shop.com", "password"));
 
-        User admin = User.builder().id(1).email("admin@shop.com").role(Role.ADMIN).isActive(true).build();
+        User admin = User.builder().id(1).email("admin@shop.com").role(Role.ADMIN).isActive(true).accountStatus(AccountStatus.ACTIVE).build();
         CreateStaffRequest request = new CreateStaffRequest();
         request.setFullName("Staff One");
         request.setEmail("staff1@shop.com");
@@ -172,5 +177,43 @@ class UserServiceImplTest {
         assertNull(response.getPhoneNumber());
         assertNull(response.getAddress());
         assertNull(response.getBio());
+    }
+
+    @Test
+    void deactivateUserShouldLockAccount() {
+        User customer = User.builder()
+                .id(9)
+                .email("customer@shop.com")
+                .role(Role.CUSTOMER)
+                .isActive(true)
+                .accountStatus(AccountStatus.ACTIVE)
+                .build();
+
+        when(userRepository.findById(9)).thenReturn(Optional.of(customer));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        userService.deactivateUser(9);
+
+        assertEquals(AccountStatus.LOCKED, customer.getAccountStatus());
+        assertEquals(false, customer.getIsActive());
+    }
+
+    @Test
+    void deleteAccountShouldMarkAccountDeleted() {
+        User customer = User.builder()
+                .id(11)
+                .email("customer@shop.com")
+                .role(Role.CUSTOMER)
+                .isActive(true)
+                .accountStatus(AccountStatus.ACTIVE)
+                .build();
+
+        when(userRepository.findById(11)).thenReturn(Optional.of(customer));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        userService.deleteAccountById(11L, true);
+
+        assertEquals(AccountStatus.DELETED, customer.getAccountStatus());
+        assertEquals(false, customer.getIsActive());
     }
 }

@@ -1,5 +1,6 @@
 package com.example.fashionshop.modules.user.entity;
 
+import com.example.fashionshop.common.enums.AccountStatus;
 import com.example.fashionshop.common.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -47,6 +48,10 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false, length = 20)
+    private AccountStatus accountStatus;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -61,6 +66,9 @@ public class User {
         }
         if (isActive == null) {
             isActive = true;
+        }
+        if (accountStatus == null) {
+            accountStatus = Boolean.TRUE.equals(isActive) ? AccountStatus.ACTIVE : AccountStatus.LOCKED;
         }
         if (role == null) {
             role = Role.CUSTOMER;

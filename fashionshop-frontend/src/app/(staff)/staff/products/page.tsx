@@ -27,6 +27,7 @@ export default function StaffProductsPage() {
 
   const deleteMutation = useDeleteManageProductMutation();
   const products: Product[] = data?.items ?? [];
+  const metrics = data?.metrics;
 
   const handleDelete = () => {
     if (!deleteId) return;
@@ -40,7 +41,8 @@ export default function StaffProductsPage() {
     });
   };
 
-  const totalPages = data ? Math.ceil(data.total / pageSize) : 0;
+  const totalItems = data?.totalItems ?? data?.total ?? 0;
+  const totalPages = data?.totalPages ?? (totalItems > 0 ? Math.ceil(totalItems / pageSize) : 0);
 
   return (
     <div className="max-w-7xl mx-auto p-4 lg:p-8 space-y-10 bg-white min-h-screen">
@@ -66,9 +68,10 @@ export default function StaffProductsPage() {
       </header>
 
       <ProductStats
-        totalItems={data?.total || 0}
-        outOfStock={products.filter((p) => p.stockQuantity === 0).length}
-        active={products.filter((p) => p.isActive).length}
+        totalItems={totalItems}
+        outOfStock={metrics?.outOfStockItems ?? products.filter((p) => p.stockQuantity === 0).length}
+        active={metrics?.activeItems ?? products.filter((p) => p.isActive).length}
+        currentPageItems={metrics?.currentPageItems ?? products.length}
       />
 
       <AdminProductsFilters
@@ -98,7 +101,7 @@ export default function StaffProductsPage() {
               page={page + 1}
               totalPages={totalPages}
               pageSize={pageSize}
-              totalItems={data?.total || 0}
+              totalItems={totalItems}
               onPageChange={(p) => setPage(p - 1)}
             />
           </div>

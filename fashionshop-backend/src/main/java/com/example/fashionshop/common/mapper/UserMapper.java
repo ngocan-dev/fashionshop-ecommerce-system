@@ -19,6 +19,7 @@ public final class UserMapper {
                 .bio(user.getBio())
                 .role(user.getRole())
                 .isActive(user.getIsActive())
+                .accountStatus(user.getAccountStatus())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.example.fashionshop.modules.user.service;
 
+import com.example.fashionshop.common.enums.AccountStatus;
 import com.example.fashionshop.common.enums.Role;
 import com.example.fashionshop.common.exception.AccountDeletionException;
 import com.example.fashionshop.common.exception.BadRequestException;
@@ -89,7 +90,7 @@ public class UserServiceImpl implements UserService {
                             .accountId(user.getId())
                             .accountRole(user.getRole() != null ? user.getRole().name() : null)
                             .registrationDate(user.getCreatedAt())
-                            .accountStatus(Boolean.TRUE.equals(user.getIsActive()) ? "ACTIVE" : "INACTIVE")
+                            .accountStatus(resolveAccountStatus(user).name())
                             .build())
                     .addressInfo(CustomerProfileResponse.AddressInfo.builder()
                             .defaultShippingAddress(latestOrder != null ? latestOrder.getShippingAddress() : null)
@@ -132,6 +133,7 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .isActive(true)
+                .accountStatus(AccountStatus.ACTIVE)
                 .managedBy(currentUser)
                 .build();
         return UserMapper.toResponse(userRepository.save(staff));
@@ -176,7 +178,7 @@ public class UserServiceImpl implements UserService {
         if (user.getRole() == Role.ADMIN) {
             throw new BadRequestException("Cannot deactivate admin account");
         }
-        user.setIsActive(false);
+        applyAccountStatus(user, AccountStatus.LOCKED);
         userRepository.save(user);
     }
 
@@ -206,7 +208,7 @@ public class UserServiceImpl implements UserService {
         if (user.getRole() == Role.ADMIN) {
             throw new BadRequestException("Cannot modify admin account");
         }
-        user.setIsActive(true);
+        applyAccountStatus(user, AccountStatus.ACTIVE);
         userRepository.save(user);
     }
 
@@ -243,7 +245,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             // Project currently uses soft delete for user account lifecycle.
-            user.setIsActive(false);
+            applyAccountStatus(user, AccountStatus.DELETED);
             userRepository.save(user);
         } catch (DataAccessException ex) {
             throw new AccountDeletionException("Account deletion failed");
@@ -277,7 +279,7 @@ public class UserServiceImpl implements UserService {
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .status(Boolean.TRUE.equals(user.getIsActive()) ? "ACTIVE" : "INACTIVE")
+                .status(resolveAccountStatus(user).name())
                 .totalOrders(orders.size())
                 .totalSpend(totalSpend)
                 .build();
@@ -289,7 +291,7 @@ public class UserServiceImpl implements UserService {
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .role(user.getRole().name())
-                .status(Boolean.TRUE.equals(user.getIsActive()) ? "ACTIVE" : "INACTIVE")
+                .status(resolveAccountStatus(user).name())
                 .build();
     }
 
@@ -321,5 +323,17 @@ public class UserServiceImpl implements UserService {
             throw new UnauthorizedException("Unauthorized");
         }
         return user;
+    }
+
+    private AccountStatus resolveAccountStatus(User user) {
+        if (user.getAccountStatus() != null) {
+            return user.getAccountStatus();
+        }
+        return Boolean.TRUE.equals(user.getIsActive()) ? AccountStatus.ACTIVE : AccountStatus.LOCKED;
+    }
+
+    private void applyAccountStatus(User user, AccountStatus accountStatus) {
+        user.setAccountStatus(accountStatus);
+        user.setIsActive(accountStatus == AccountStatus.ACTIVE);
     }
 }

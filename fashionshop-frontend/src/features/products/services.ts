@@ -123,7 +123,21 @@ export async function deleteProduct(id: string) {
   return apiRequest(Promise.resolve(response));
 }
 
-export async function fetchManageProducts(filter?: ProductFilter) {
+export type ManageProductsResponse = {
+  items: Product[];
+  page: number;
+  size: number;
+  total: number;
+  totalItems: number;
+  totalPages: number;
+  metrics?: {
+    activeItems?: number;
+    outOfStockItems?: number;
+    currentPageItems?: number;
+  };
+};
+
+export async function fetchManageProducts(filter?: ProductFilter): Promise<ManageProductsResponse> {
   if (USE_MOCK) {
     let filteredItems = [...allMockProducts];
 
@@ -148,14 +162,35 @@ export async function fetchManageProducts(filter?: ProductFilter) {
     return {
       items: paginatedItems,
       total: filteredItems.length,
+      totalItems: filteredItems.length,
+      totalPages: Math.ceil(filteredItems.length / size),
       page,
       size,
+      metrics: {
+        activeItems: filteredItems.length,
+        outOfStockItems: filteredItems.filter((product) => product.stockQuantity <= 0).length,
+        currentPageItems: paginatedItems.length,
+      },
     };
   }
   const response = await api.get<ApiResponse<any>>('/api/products/manage', { params: filter });
   const raw = await apiRequest(Promise.resolve(response));
-  if (raw && Array.isArray(raw.items)) return { ...raw, items: raw.items.map(normalizeManageProduct) };
-  return raw;
+  if (raw && Array.isArray(raw.items)) {
+    return {
+      ...raw,
+      total: raw.total ?? raw.totalItems ?? 0,
+      totalItems: raw.totalItems ?? raw.total ?? 0,
+      items: raw.items.map(normalizeManageProduct),
+    };
+  }
+  return {
+    items: [],
+    page: filter?.page ?? 0,
+    size: filter?.size ?? 10,
+    total: 0,
+    totalItems: 0,
+    totalPages: 0,
+  };
 }
 
 export async function fetchManageProduct(id: string) {

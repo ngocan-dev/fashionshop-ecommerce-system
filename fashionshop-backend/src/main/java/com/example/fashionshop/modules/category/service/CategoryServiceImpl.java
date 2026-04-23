@@ -54,4 +54,12 @@ public class CategoryServiceImpl implements CategoryService {
                         .build())
                 .toList();
     }
+
+    private String normalizeOptional(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
 }

@@ -37,11 +37,11 @@ export default function AdminProductsPage() {
   const deleteMutation = useDeleteManageProductMutation();
 
   const products: Product[] = response?.items ?? [];
-  const totalItems = response?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const totalItems = response?.totalItems ?? response?.total ?? 0;
+  const totalPages = Math.max(1, response?.totalPages ?? Math.ceil(totalItems / pageSize));
 
-  const outOfStockCount = products.filter((p) => p.stockQuantity === 0).length;
-  const activeCount = products.filter((p) => p.isActive).length;
+  const outOfStockCount = response?.metrics?.outOfStockItems ?? products.filter((p) => p.stockQuantity === 0).length;
+  const activeCount = response?.metrics?.activeItems ?? products.filter((p) => p.isActive).length;
 
   const handleCategoryChange = (id: number | null) => {
     setCategoryId(id);
@@ -93,6 +93,7 @@ export default function AdminProductsPage() {
         totalItems={totalItems}
         outOfStock={outOfStockCount}
         active={activeCount}
+        currentPageItems={response?.metrics?.currentPageItems ?? products.length}
       />
 
       <AdminProductsFilters

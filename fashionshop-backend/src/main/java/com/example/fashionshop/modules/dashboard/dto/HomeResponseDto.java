@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 public class HomeResponseDto {
     private List<HomeProductDto> featuredProducts;
+    private List<HomeProductDto> newArrivals;
     private List<HomeCategoryDto> categories;
     private List<HomeBannerDto> banners;
 }

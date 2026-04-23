@@ -104,6 +104,7 @@ export async function fetchAdminStaffAccounts() {
   return Array.isArray(raw) ? raw.map((staff: any) => ({
     ...staff,
     isActive: staff.status === 'ACTIVE',
+    accountStatus: staff.status,
   })) : [];
 }
 
@@ -117,6 +118,7 @@ export async function fetchAdminCustomerAccounts() {
     fullName: c.fullName ?? '',
     email: c.email ?? '',
     isActive: c.status === 'ACTIVE',
+    accountStatus: c.status,
     totalOrders: c.totalOrders || 0,
     totalSpend: c.totalSpend || 0,
   })) : [];

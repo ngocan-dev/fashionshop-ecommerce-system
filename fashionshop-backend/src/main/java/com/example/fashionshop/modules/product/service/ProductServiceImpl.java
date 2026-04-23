@@ -35,7 +35,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -185,6 +187,7 @@ public class ProductServiceImpl implements ProductService {
                     .size(result.getSize())
                     .totalItems(result.getTotalElements())
                     .totalPages(result.getTotalPages())
+                    .metrics(buildManageProductMetrics(keyword, categoryId, result.getNumberOfElements()))
                     .build();
         } catch (BadRequestException ex) {
             throw ex;
@@ -366,5 +369,38 @@ public class ProductServiceImpl implements ProductService {
         if (page < 0 || size <= 0 || size > MAX_PAGE_SIZE) {
             throw new BadRequestException("Invalid pagination parameters");
         }
+    }
+
+    private Map<String, Long> buildManageProductMetrics(String keyword, Integer categoryId, int currentPageItems) {
+        boolean hasKeyword = StringUtils.hasText(keyword);
+        boolean hasCategory = categoryId != null;
+        String normalizedKeyword = hasKeyword ? keyword.trim() : null;
+
+        long totalItems;
+        long outOfStock;
+
+        if (hasKeyword && hasCategory) {
+            totalItems = productRepository.countByIsActiveTrueAndNameContainingIgnoreCaseAndCategoryId(normalizedKeyword, categoryId);
+            outOfStock = productRepository.countByIsActiveTrueAndNameContainingIgnoreCaseAndCategoryIdAndStockQuantityLessThanEqual(
+                    normalizedKeyword,
+                    categoryId,
+                    0
+            );
+        } else if (hasKeyword) {
+            totalItems = productRepository.countByIsActiveTrueAndNameContainingIgnoreCase(normalizedKeyword);
+            outOfStock = productRepository.countByIsActiveTrueAndNameContainingIgnoreCaseAndStockQuantityLessThanEqual(normalizedKeyword, 0);
+        } else if (hasCategory) {
+            totalItems = productRepository.countByIsActiveTrueAndCategoryId(categoryId);
+            outOfStock = productRepository.countByIsActiveTrueAndCategoryIdAndStockQuantityLessThanEqual(categoryId, 0);
+        } else {
+            totalItems = productRepository.countByIsActiveTrue();
+            outOfStock = productRepository.countByIsActiveTrueAndStockQuantityLessThanEqual(0);
+        }
+
+        Map<String, Long> metrics = new LinkedHashMap<>();
+        metrics.put("activeItems", totalItems);
+        metrics.put("outOfStockItems", outOfStock);
+        metrics.put("currentPageItems", (long) currentPageItems);
+        return metrics;
     }
 }

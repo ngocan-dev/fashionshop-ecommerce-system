@@ -1,7 +1,9 @@
 package com.example.fashionshop.modules.auth.service;
 
+import com.example.fashionshop.common.enums.AccountStatus;
 import com.example.fashionshop.common.enums.Role;
 import com.example.fashionshop.common.exception.AccountCreationException;
+import com.example.fashionshop.common.exception.AuthStatusException;
 import com.example.fashionshop.common.exception.AuthenticationSystemException;
 import com.example.fashionshop.common.exception.BadRequestException;
 import com.example.fashionshop.common.exception.UnauthorizedException;
@@ -112,6 +114,8 @@ class AuthServiceImplTest {
                 .fullName("Test User")
                 .email("user@test.com")
                 .role(Role.CUSTOMER)
+                .isActive(true)
+                .accountStatus(AccountStatus.ACTIVE)
                 .build();
 
         when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));
@@ -137,9 +141,56 @@ class AuthServiceImplTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
-        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> authService.login(request));
+        AuthStatusException exception = assertThrows(AuthStatusException.class, () -> authService.login(request));
 
-        assertEquals("Invalid email or password", exception.getMessage());
+        assertEquals("INVALID_CREDENTIALS", exception.getCode());
+        assertEquals("Sai tài khoản hoặc mật khẩu", exception.getMessage());
+    }
+
+    @Test
+    void loginShouldRejectLockedAccountBeforeAuthentication() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("locked@test.com");
+        request.setPassword("password123");
+
+        User user = User.builder()
+                .id(2)
+                .email("locked@test.com")
+                .role(Role.CUSTOMER)
+                .isActive(false)
+                .accountStatus(AccountStatus.LOCKED)
+                .build();
+
+        when(userRepository.findByEmail("locked@test.com")).thenReturn(Optional.of(user));
+
+        AuthStatusException exception = assertThrows(AuthStatusException.class, () -> authService.login(request));
+
+        assertEquals("ACCOUNT_LOCKED", exception.getCode());
+        assertEquals("Tài khoản đã bị khóa", exception.getMessage());
+        verify(authenticationManager, never()).authenticate(any(UsernamePasswordAuthenticationToken.class));
+    }
+
+    @Test
+    void loginShouldRejectDeletedAccountBeforeAuthentication() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("deleted@test.com");
+        request.setPassword("password123");
+
+        User user = User.builder()
+                .id(3)
+                .email("deleted@test.com")
+                .role(Role.CUSTOMER)
+                .isActive(false)
+                .accountStatus(AccountStatus.DELETED)
+                .build();
+
+        when(userRepository.findByEmail("deleted@test.com")).thenReturn(Optional.of(user));
+
+        AuthStatusException exception = assertThrows(AuthStatusException.class, () -> authService.login(request));
+
+        assertEquals("ACCOUNT_DELETED", exception.getCode());
+        assertEquals("Tài khoản đã bị xóa", exception.getMessage());
+        verify(authenticationManager, never()).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 
     @Test

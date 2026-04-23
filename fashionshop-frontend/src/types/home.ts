@@ -1,9 +1,24 @@
 import type { Category } from './category';
-import type { Product } from './product';
+
+export type HomeProduct = {
+  id: number;
+  name: string;
+  description?: string | null;
+  price: number;
+  imageUrl?: string | null;
+  categoryName?: string | null;
+};
+
+export type HomeBanner = {
+  id: number;
+  title: string;
+  imageUrl?: string | null;
+  linkUrl?: string | null;
+};
 
 export type HomePayload = {
-  featuredProducts: Product[];
-  newArrivals: Product[];
+  featuredProducts: HomeProduct[];
+  newArrivals: HomeProduct[];
   categories: Category[];
-  banners: Array<{ title: string; description: string; ctaLabel: string; href: string }>;
+  banners: HomeBanner[];
 };

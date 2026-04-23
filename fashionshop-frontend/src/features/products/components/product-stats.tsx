@@ -6,9 +6,10 @@ type Props = {
   totalItems: number;
   outOfStock: number;
   active: number;
+  currentPageItems?: number;
 };
 
-export function ProductStats({ totalItems, outOfStock, active }: Props) {
+export function ProductStats({ totalItems, outOfStock, active, currentPageItems }: Props) {
   return (
     <div className="grid grid-cols-12 gap-6 mb-12">
       
@@ -36,7 +37,7 @@ export function ProductStats({ totalItems, outOfStock, active }: Props) {
           {outOfStock}
         </p>
         <div className="mt-4 flex items-center gap-2 text-xs text-neutral-400">
-          <span>Current page items</span>
+          <span>{currentPageItems != null ? `${currentPageItems} items on this page` : 'Live stock coverage'}</span>
         </div>
       </div>
 

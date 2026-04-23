@@ -36,6 +36,12 @@ public class HomeServiceImpl implements HomeService {
                     .map(this::toHomeProduct)
                     .toList();
 
+            List<HomeProductDto> newArrivals = productRepository
+                    .findByIsActiveTrueOrderByCreatedAtDesc(PageRequest.of(0, 8))
+                    .stream()
+                    .map(this::toHomeProduct)
+                    .toList();
+
             List<HomeCategoryDto> categories = categoryRepository
                     .findTop8ByIsActiveTrueOrderByNameAsc()
                     .stream()
@@ -50,6 +56,7 @@ public class HomeServiceImpl implements HomeService {
 
             return HomeResponseDto.builder()
                     .featuredProducts(featuredProducts)
+                    .newArrivals(newArrivals)
                     .categories(categories)
                     .banners(banners)
                     .build();

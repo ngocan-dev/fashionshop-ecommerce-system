@@ -1,5 +1,6 @@
 package com.example.fashionshop.modules.user.dto;
 
+import com.example.fashionshop.common.enums.AccountStatus;
 import com.example.fashionshop.common.enums.Role;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +19,6 @@ public class UserResponse {
     private String bio;
     private Role role;
     private Boolean isActive;
+    private AccountStatus accountStatus;
     private LocalDateTime createdAt;
 }

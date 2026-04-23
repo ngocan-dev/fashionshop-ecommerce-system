@@ -84,6 +84,21 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("SELECT p FROM Product p JOIN FETCH p.category WHERE p.isFeatured = true AND p.isActive = true ORDER BY p.createdAt DESC")
     List<Product> findTop8FeaturedActiveWithCategory(Pageable pageable);
 
+    long countByIsActiveTrue();
+
+    long countByIsActiveTrueAndStockQuantityLessThanEqual(Integer stockQuantity);
+
+    long countByIsActiveTrueAndNameContainingIgnoreCase(String keyword);
+
+    long countByIsActiveTrueAndCategoryId(Integer categoryId);
+
+    long countByIsActiveTrueAndNameContainingIgnoreCaseAndCategoryId(String keyword, Integer categoryId);
+
+    long countByIsActiveTrueAndNameContainingIgnoreCaseAndStockQuantityLessThanEqual(String keyword, Integer stockQuantity);
+
+    long countByIsActiveTrueAndCategoryIdAndStockQuantityLessThanEqual(Integer categoryId, Integer stockQuantity);
+
+    long countByIsActiveTrueAndNameContainingIgnoreCaseAndCategoryIdAndStockQuantityLessThanEqual(String keyword, Integer categoryId, Integer stockQuantity);
 
     Optional<Product> findByIdAndIsActiveTrue(Integer id);
 }

@@ -8,12 +8,14 @@ export type ParsedApiError = {
 
 export function parseApiError(error: unknown): ParsedApiError {
   if (typeof error === 'object' && error && 'message' in error && typeof (error as { message?: unknown }).message === 'string') {
-    const axiosError = error as AxiosError<{ success?: boolean; message?: string }>;
+    const axiosError = error as AxiosError<{ success?: boolean; message?: string; code?: string }>;
     const status = axiosError.response?.status;
     const responseMessage = axiosError.response?.data?.message;
+    const responseCode = axiosError.response?.data?.code;
     return {
       message: responseMessage || axiosError.message || 'An unexpected error occurred',
       status,
+      code: responseCode,
     };
   }
 
