@@ -55,7 +55,7 @@ class ProductServiceImplManageListTest {
         when(productRepository.findByIsActiveTrue(PageRequest.of(0, 10)))
                 .thenReturn(new PageImpl<>(List.of(product), PageRequest.of(0, 10), 1));
 
-        PaginationResponse<ProductManageSummaryResponse> response = productService.getManageProducts(0, 10, null);
+        PaginationResponse<ProductManageSummaryResponse> response = productService.getManageProducts(0, 10, null, null);
 
         assertEquals(1, response.getItems().size());
         assertEquals("SKU-5", response.getItems().get(0).getSku());
@@ -65,14 +65,14 @@ class ProductServiceImplManageListTest {
 
     @Test
     void getManageProducts_shouldThrowBadRequestWhenPagingInvalid() {
-        assertThrows(BadRequestException.class, () -> productService.getManageProducts(-1, 10, null));
-        assertThrows(BadRequestException.class, () -> productService.getManageProducts(0, 0, null));
+        assertThrows(BadRequestException.class, () -> productService.getManageProducts(-1, 10, null, null));
+        assertThrows(BadRequestException.class, () -> productService.getManageProducts(0, 0, null, null));
     }
 
     @Test
     void getManageProducts_shouldThrowLoadExceptionWhenRepositoryFails() {
         when(productRepository.findByIsActiveTrue(PageRequest.of(0, 10))).thenThrow(new RuntimeException("db error"));
 
-        assertThrows(ProductListLoadException.class, () -> productService.getManageProducts(0, 10, null));
+        assertThrows(ProductListLoadException.class, () -> productService.getManageProducts(0, 10, null, null));
     }
 }

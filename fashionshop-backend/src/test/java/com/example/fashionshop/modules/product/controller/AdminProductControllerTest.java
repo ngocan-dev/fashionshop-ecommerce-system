@@ -69,7 +69,7 @@ class AdminProductControllerTest {
                 .totalPages(1)
                 .build();
 
-        when(productService.getManageProducts(0, 10, null)).thenReturn(page);
+        when(productService.getManageProducts(0, 10, null, null)).thenReturn(page);
 
 
         mockMvc.perform(get("/api/products/manage")
@@ -93,7 +93,7 @@ class AdminProductControllerTest {
                 .totalPages(0)
                 .build();
 
-        when(productService.getManageProducts(0, 10, null)).thenReturn(emptyPage);
+        when(productService.getManageProducts(0, 10, null, null)).thenReturn(emptyPage);
 
         mockMvc.perform(get("/api/products/manage").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -104,7 +104,7 @@ class AdminProductControllerTest {
 
     @Test
     void getProductList_shouldReturnUnableToLoadWhenRetrievalFails() throws Exception {
-        when(productService.getManageProducts(0, 10, null)).thenThrow(new ProductListLoadException());
+        when(productService.getManageProducts(0, 10, null, null)).thenThrow(new ProductListLoadException());
 
         mockMvc.perform(get("/api/products/manage").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
