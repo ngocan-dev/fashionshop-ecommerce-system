@@ -23,6 +23,8 @@ const colorOptions = [
   { id: 'dark-brown', label: 'Dark Brown', swatch: '#2f2a27' },
 ];
 
+const numberFormatter = new Intl.NumberFormat('en-US');
+
 export function ProductFilters({
   selectedCategory,
   selectedSize,
@@ -124,7 +126,7 @@ export function ProductFilters({
           />
           <div className="flex items-center justify-between text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-zinc-500">
             <span>$0</span>
-            <span>${effectiveMaxPrice.toLocaleString()}</span>
+            <span>${numberFormatter.format(effectiveMaxPrice)}</span>
           </div>
         </section>
       </div>
