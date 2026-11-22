@@ -58,7 +58,7 @@ class ProductServiceImplStoreListTest {
         when(productRepository.findByIsActiveTrueOrderByCreatedAtDesc(PageRequest.of(0, 12)))
                 .thenReturn(new PageImpl<>(List.of(product), PageRequest.of(0, 12), 1));
 
-        PaginationResponse<StoreProductSummaryResponse> response = productService.getStoreProducts(0, 12);
+        PaginationResponse<StoreProductSummaryResponse> response = productService.getStoreProducts(0, 12, null, null);
 
         assertEquals(1, response.getItems().size());
         assertEquals("Oxford Shirt", response.getItems().get(0).getName());
@@ -68,9 +68,9 @@ class ProductServiceImplStoreListTest {
 
     @Test
     void getStoreProducts_shouldThrowBadRequestWhenPaginationInvalid() {
-        assertThrows(BadRequestException.class, () -> productService.getStoreProducts(-1, 12));
-        assertThrows(BadRequestException.class, () -> productService.getStoreProducts(0, 0));
-        assertThrows(BadRequestException.class, () -> productService.getStoreProducts(0, 100));
+        assertThrows(BadRequestException.class, () -> productService.getStoreProducts(-1, 12, null, null));
+        assertThrows(BadRequestException.class, () -> productService.getStoreProducts(0, 0, null, null));
+        assertThrows(BadRequestException.class, () -> productService.getStoreProducts(0, 100, null, null));
     }
 
     @Test
@@ -78,6 +78,6 @@ class ProductServiceImplStoreListTest {
         when(productRepository.findByIsActiveTrueOrderByCreatedAtDesc(PageRequest.of(0, 12)))
                 .thenThrow(new RuntimeException("db error"));
 
-        assertThrows(StoreProductListLoadException.class, () -> productService.getStoreProducts(0, 12));
+        assertThrows(StoreProductListLoadException.class, () -> productService.getStoreProducts(0, 12, null, null));
     }
 }

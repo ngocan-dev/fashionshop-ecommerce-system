@@ -58,7 +58,7 @@ class StoreProductControllerTest {
                 .totalPages(1)
                 .build();
 
-        when(productService.getStoreProducts(0, 12)).thenReturn(page);
+        when(productService.getStoreProducts(0, 12, null, null)).thenReturn(page);
 
         mockMvc.perform(get("/api/store/products")
                         .param("page", "0")
@@ -76,12 +76,12 @@ class StoreProductControllerTest {
         PaginationResponse<StoreProductSummaryResponse> page = PaginationResponse.<StoreProductSummaryResponse>builder()
                 .items(List.of())
                 .page(0)
-                .size(12)
+                .size(20)
                 .totalItems(0)
                 .totalPages(0)
                 .build();
 
-        when(productService.getStoreProducts(0, 12)).thenReturn(page);
+        when(productService.getStoreProducts(0, 20, null, null)).thenReturn(page);
 
         mockMvc.perform(get("/api/store/products").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -91,7 +91,7 @@ class StoreProductControllerTest {
 
     @Test
     void browse_shouldReturnUnableToLoadProductsWhenServiceFails() throws Exception {
-        when(productService.getStoreProducts(0, 12)).thenThrow(new StoreProductListLoadException());
+        when(productService.getStoreProducts(0, 20, null, null)).thenThrow(new StoreProductListLoadException());
 
         mockMvc.perform(get("/api/store/products").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
@@ -101,7 +101,7 @@ class StoreProductControllerTest {
 
     @Test
     void browse_shouldReturnBadRequestWhenPaginationInvalid() throws Exception {
-        when(productService.getStoreProducts(-1, 12)).thenThrow(new BadRequestException("Invalid pagination parameters"));
+        when(productService.getStoreProducts(-1, 20, null, null)).thenThrow(new BadRequestException("Invalid pagination parameters"));
 
         mockMvc.perform(get("/api/store/products").param("page", "-1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())

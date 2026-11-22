@@ -52,7 +52,7 @@ class MeControllerValidationTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Validation failed")));
+                .andExpect(jsonPath("$.message").value("Email format is invalid"));
     }
 
     @Test
