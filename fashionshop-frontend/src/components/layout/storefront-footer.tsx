@@ -10,16 +10,15 @@ const footerGroups: FooterGroup[] = [
   {
     title: 'Services',
     links: [
-      { label: 'Sustainability', href: '/policies#sustainability' },
-      { label: 'Shipping & Returns', href: '/policies#shipping-returns' },
-      { label: 'FAQ', href: '/faq' },
+      { label: 'Shipping Policy', href: '/policies#shipping-policy' },
+      { label: 'Returns & Refunds', href: '/policies#return-refund' },
     ],
   },
   {
     title: 'Legal',
     links: [
       { label: 'Privacy Policy', href: '/policies#privacy-policy' },
-      { label: 'Terms of Service', href: '/policies#terms-of-service' },
+      { label: 'Terms & Conditions', href: '/policies#terms-conditions' },
     ],
   },
   {
