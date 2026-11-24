@@ -474,8 +474,8 @@ On Vercel/Railway, the "server viewpoint" is the relevant deployment, log, metri
 
 | Component | Plan observed | Evidence source |
 | --- | --- | --- |
-| Vercel frontend | Hobby (free) | Vercel team badge "Hobby" |
-| Railway backend + MySQL | Trial credit; dashboard showed "30 days or $4.97 left" at 17:52 | Railway project header / usage page |
+| Vercel frontend | Hobby (free); allocation 1M CDN requests and 100 GB data transfer; no payment method attached | Vercel Billing and Usage pages (Figures 3.12, 3.12b) |
+| Railway backend + MySQL | Trial plan: one-time $5.00 credit, 1 GB RAM, 2 vCPU, 1 GB disk | Railway Usage page (Figure 3.11) |
 | GitHub Actions | Public repository | Account Actions usage |
 | UptimeRobot | Free plan (5-minute interval) | UptimeRobot account |
 | Backup storage | Local disk only; no cloud storage cost | — |
@@ -485,21 +485,27 @@ On Vercel/Railway, the "server viewpoint" is the relevant deployment, log, metri
 
 | Measurement | Actual value | Source |
 | --- | --- | --- |
-| Deployment observation period | 24 November 2026, from about 13:14 (MySQL ready) | Deployment timestamps |
-| Resource/plan charges before credits | Pending | Railway billing breakdown |
-| Trial credits applied | Pending (balance $4.97 remaining at 17:52) | Railway billing |
-| Actual amount payable | Pending | Invoice or billing statement |
-| Estimated monthly cost without trial credits | Pending | Measured daily usage plus plan rules |
+| Deployment observation period | 24 November 2026, from about 13:14 (MySQL ready) to the evening of the same day | Deployment timestamps |
+| Railway resource usage (backend + MySQL) | $0.0404 for project `fashionshop-sna` (Current Usage $0.04) | Railway Usage, billing period Nov 24 – Nov 25 |
+| Railway credits | $5.00 available; Credits Used $0.00 so far in the period; Estimated Month's Cost $0.00 | Railway Usage |
+| Vercel usage (last 30 days) | Fast Data Transfer 15.52 MB, Fast Origin Transfer 3.36 MB, CDN Requests 1.4K, ISR Reads 410 | Vercel Usage, 25 Oct – 24 Nov |
+| GitHub Actions, UptimeRobot | Public repository / free plan | Account pages |
+| **Actual amount payable** | **$0.00**: Railway usage is covered by trial credit; Vercel Hobby has no payment method and usage is far below the allocation | Railway and Vercel billing pages |
+| Estimated monthly cost without trial credits | About $5 per month for Railway at the observed rate; $0 for Vercel at this traffic level | Rough projection, see below |
 
-Free credits reduce cash payment; they do not mean the resources cost nothing. Do not copy AWS prices or assume older quoted platform prices still apply.
+Projection: the project used about $0.04 of Railway resources in roughly six hours of operation (about $0.16 per day), which extrapolates to about $5 for 30 days with similar traffic. This assumes the backend stays awake (the 5-minute UptimeRobot check prevents sleeping) and the database stays small. It is an order-of-magnitude estimate, not an invoice. Vercel usage is about 0.02% of the Hobby data-transfer allocation and 0.14% of the request allocation. Free credits reduce cash payment; they do not mean the resources cost nothing.
 
-> 📷 **Insert image:** `03-11-railway-usage.png` [Pending capture]
+> 📷 **Insert image:** `03-11-railway-usage.png`
 >
-> **Figure 3.11.** Railway usage and remaining trial credit for project `fashionshop-sna` during the observation period (payment details hidden).
+> **Figure 3.11.** Railway usage for Nov 24 – Nov 25: current usage $0.04 (project `fashionshop-sna` $0.0404), $5.00 trial credit available and estimated month's cost $0.00 on the Trial plan (1 GB RAM, 2 vCPU, 1 GB disk).
 
-> 📷 **Insert image:** `03-12-vercel-usage.png` [Pending capture]
+> 📷 **Insert image:** `03-12-vercel-usage.png`
 >
-> **Figure 3.12.** Vercel Hobby plan usage for the frontend project (payment details hidden).
+> **Figure 3.12.** Vercel usage for the last 30 days (25 Oct – 24 Nov): 15.52 MB Fast Data Transfer and 1.4K CDN requests, far below the Hobby allocation of 100 GB and 1M requests; no charges.
+
+> 📷 **Insert image:** `03-12b-vercel-billing-hobby.png`
+>
+> **Figure 3.12b.** Vercel team billing: Hobby plan active; no payment method is attached, so no charges can be incurred.
 
 #### 3.2.3 Cost control
 
@@ -507,7 +513,7 @@ Restore resources were created only on local hardware. The temporary public data
 
 ### 3.3 Summary
 
-FashionShop runs publicly on Vercel (frontend) and Railway (Spring Boot and MySQL with a persistent volume), with the database reachable only through private networking. Production starts with Hibernate schema validation and serves the demo catalogue over HTTPS with exact-origin CORS and JWT-protected endpoints. The advanced scope was demonstrated: a ruleset blocks merges unless CI passes (PR #10), UptimeRobot detected a controlled six-minute outage and sent DOWN/UP e-mails, a backup taken through an encrypted tunnel restored into an isolated database with identical data, and a Railway rollback and roll-forward kept the API healthy. Remaining gaps: a dedicated least-privilege database user, scheduled backups with off-platform storage, captured role walkthroughs (S05), and billing figures. Payment gateways remain mocks; the report describes payments as simulated.
+FashionShop runs publicly on Vercel (frontend) and Railway (Spring Boot and MySQL with a persistent volume), with the database reachable only through private networking. Production starts with Hibernate schema validation and serves the demo catalogue over HTTPS with exact-origin CORS and JWT-protected endpoints. The advanced scope was demonstrated: a ruleset blocks merges unless CI passes (PR #10), UptimeRobot detected a controlled six-minute outage and sent DOWN/UP e-mails, a backup taken through an encrypted tunnel restored into an isolated database with identical data, and a Railway rollback and roll-forward kept the API healthy. Remaining gaps: a dedicated least-privilege database user, scheduled backups with off-platform storage, and captured role walkthroughs (S05). The demonstration cost $0.00 in cash: about $0.04 of Railway usage was covered by trial credit and Vercel usage stayed within the free Hobby allocation. Payment gateways remain mocks; the report describes payments as simulated.
 
 ### Implementation log
 
