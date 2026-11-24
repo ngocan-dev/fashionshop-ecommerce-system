@@ -1,5 +1,7 @@
 # FashionShop E-Commerce System
 
+> Chuẩn bị deploy Vercel + Railway và nhật ký theo cấu trúc pre-report: [Deployment report](docs/deployment-report.md). Chưa triển khai cloud; xem mục Results để biết các kiểm tra còn thất bại.
+
 Hệ thống thương mại điện tử thời trang gồm giao diện **Next.js**, REST API **Spring Boot** và cơ sở dữ liệu **MySQL**. Dự án hỗ trợ luồng mua sắm của khách hàng và các màn hình quản lý dành cho nhân viên, quản trị viên.
 
 ## Mục lục
@@ -148,6 +150,11 @@ Mở terminal thứ nhất từ thư mục gốc dự án.
 cd fashionshop-backend
 $env:SPRING_DATASOURCE_USERNAME = "root"
 $env:SPRING_DATASOURCE_PASSWORD = "your_mysql_password"
+$jwtBytes = New-Object byte[] 32
+$jwtRng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$jwtRng.GetBytes($jwtBytes)
+$env:JWT_SECRET = [Convert]::ToBase64String($jwtBytes)
+$jwtRng.Dispose()
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -157,6 +164,7 @@ $env:SPRING_DATASOURCE_PASSWORD = "your_mysql_password"
 cd fashionshop-backend
 export SPRING_DATASOURCE_USERNAME='root'
 export SPRING_DATASOURCE_PASSWORD='your_mysql_password'
+export JWT_SECRET="$(openssl rand -base64 32)"
 sh ./mvnw spring-boot:run
 ```
 
@@ -177,7 +185,7 @@ Tạo file `.env.local` trong thư mục frontend với nội dung:
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8081
 ```
 
-`env.example` và giá trị fallback trong API client hiện dùng cổng **8080**, nên cần đặt lại thành **8081** để khớp backend. URL này không có hậu tố `/api`, vì các service đã khai báo đường dẫn API.
+`env.example` và API client dùng cổng **8081** để khớp backend. URL này không có hậu tố `/api`, vì các service đã khai báo đường dẫn API.
 
 ```sh
 npm run dev
@@ -204,14 +212,14 @@ Backend đọc cấu hình từ [application.properties](fashionshop-backend/src
 | --- | --- |
 | `SPRING_DATASOURCE_URL` | JDBC tới `localhost:3306/ecommerce_db`; cấu hình hiện tại có thêm tham số timezone và SQL mode. Chỉ ghi đè khi cần đổi host, port hoặc database. |
 | `SPRING_DATASOURCE_USERNAME` | Mặc định `root`; thay bằng tài khoản MySQL của bạn. |
-| `SPRING_DATASOURCE_PASSWORD` | Đặt theo môi trường local; không sao chép mật khẩu được lưu trong mã nguồn. |
+| `SPRING_DATASOURCE_PASSWORD` | Đặt theo môi trường; mật khẩu không còn được lưu trong cấu hình mã nguồn. |
 | `SERVER_PORT` | `8081` |
 | `SPRING_JPA_HIBERNATE_DDL_AUTO` | `update` |
-| `JWT_SECRET` | Khóa ký JWT dạng Base64; dùng khóa riêng cho môi trường triển khai. |
+| `JWT_SECRET` | Bắt buộc: khóa ký JWT Base64 từ ít nhất 32 byte ngẫu nhiên; dùng khóa riêng cho môi trường triển khai. |
 | `JWT_EXPIRATION_MS` | `86400000` mili giây, tương đương 24 giờ. |
 | `NEXT_PUBLIC_API_BASE_URL` | Biến frontend: đặt `http://localhost:8081` trong `.env.local`. |
 
-CORS hiện cho phép origin `http://localhost:3000` trong cả `SecurityConfig.java` và `CorsConfig.java`. Khi đổi cổng frontend hoặc dùng domain khác, cập nhật cấu hình CORS tương ứng. Sau khi đổi biến frontend, khởi động lại dev server; với production, build lại để áp dụng giá trị `NEXT_PUBLIC_*`.
+CORS được quản lý tại `SecurityConfig.java`, đọc `APP_CORS_ALLOWED_ORIGINS` và mặc định cho local là `http://localhost:3000`. Khi đổi cổng frontend hoặc dùng domain khác, đặt biến `APP_CORS_ALLOWED_ORIGINS` tương ứng. Sau khi đổi biến frontend, khởi động lại dev server; với production, build lại để áp dụng giá trị `NEXT_PUBLIC_*`.
 
 <a id="dung-thu"></a>
 ## Tài khoản và luồng dùng thử
@@ -329,8 +337,8 @@ java -jar target/fashionshop-0.0.1-SNAPSHOT.jar
 
 - Thanh toán có các implementation **mock** cho MoMo, VNPay và banking; chưa phải kết nối giao dịch thật với nhà cung cấp.
 - `NotificationServiceImpl` hiện ghi log thông báo đơn hàng; chưa gửi email, SMS hay push notification.
-- `DataInitializer` tự đặt tồn kho thành **50** cho từng sản phẩm đang hoạt động có tồn kho `0` hoặc `null` mỗi lần ứng dụng sẵn sàng. Cần điều chỉnh hành vi này trước khi dùng cho tồn kho thực tế.
-- Cấu hình hiện tại hướng đến local development: CORS cố định, Hibernate `update`, tài khoản mẫu và cấu hình JWT mặc định. Khi triển khai cần cấu hình riêng cho môi trường, quản lý secret và schema phù hợp.
+- `DataInitializer` mặc định bị tắt. Chỉ bật `APP_DEMO_INITIALIZE_STOCK=true` khi cần bổ sung tồn kho demo ở local; giữ tắt trên cloud.
+- Cấu hình hiện tại hướng đến local development: Hibernate `update` ở local và tài khoản mẫu. JWT_SECRET hiện bắt buộc; profile prod dùng schema validation và CORS từ môi trường. Khi triển khai cần cấu hình riêng cho môi trường, quản lý secret và schema phù hợp.
 - Dự án sử dụng giấy phép [MIT](LICENSE). Xem file giấy phép để biết điều kiện sử dụng và phân phối.
 
 <a id="tai-lieu"></a>

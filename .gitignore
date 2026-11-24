@@ -1,0 +1,7 @@
+# Local deployment secrets and database exports
+.env
+.env.*
+!env.example
+*.sql.gz
+backups/
+*-verification.log
