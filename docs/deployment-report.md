@@ -110,6 +110,8 @@ Figure 2.2 [Pending capture]: tool versions and build verification terminal outp
 
 #### Step 2 Create Railway database — Pending
 
+Provisioning update from user-supplied Railway screenshot and startup logs: project `fashionshop-sna`, environment `production`, MySQL service Online with `mysql-volume`. The final server reports MySQL 8.4.13 (update string 8.4.13.1), database `railway` created, and ready for connections on port 3306 at 2026-11-24 06:14:11 UTC (13:14:11 Asia/Saigon). The earlier port 0 readiness and shutdown belong to the temporary initialization server. This confirms server startup, not external client authentication, schema import, application compatibility or persistence across redeployment. Those checks remain pending. Capture `02-03-mysql-startup.png` showing final port 3306 readiness and `02-02-mysql-service.png` showing the project/service/volume. The existing SQL dump is from MySQL 8.0; import into 8.4 and backend schema validation still require verification.
+
 1. Create the project/environment and a MySQL service with persistent storage. Verify the MySQL version against the supplied MySQL 8 dump.
 2. Create an empty database and import `database/ecommerce_db.sql` once. It contains DROP TABLE statements; never run it against data that must be preserved.
 3. Use an administration credential for import and a separate application user with SELECT, INSERT, UPDATE and DELETE on that database. The production profile validates schema and does not run DDL.
