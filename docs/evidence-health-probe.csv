@@ -1,0 +1,47 @@
+﻿timestamp_local,http_code,time_total_s,body
+2026-11-24 17:34:50,200,0.441507,{"status":"UP"}
+2026-11-24 17:35:05,200,0.489865,{"status":"UP"}
+2026-11-24 17:35:21,200,0.479472,{"status":"UP"}
+2026-11-24 17:35:36,200,0.491347,{"status":"UP"}
+2026-11-24 17:35:52,200,0.555841,{"status":"UP"}
+2026-11-24 17:36:07,200,0.454965,{"status":"UP"}
+2026-11-24 17:36:23,200,0.477573,{"status":"UP"}
+2026-11-24 17:36:38,404,0.456403,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:36:54,404,0.531384,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:37:09,404,0.420254,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:37:25,404,0.436686,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:37:40,404,0.409889,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:37:56,404,0.529278,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:38:11,404,0.451202,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:38:27,404,0.449802,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:38:42,404,0.442323,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:38:58,404,0.521424,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:39:13,404,0.466014,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:39:29,404,0.434962,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:39:44,404,0.455590,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:40:00,404,0.552211,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:40:15,404,0.446163,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:40:31,404,0.438344,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:40:46,404,0.453640,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:41:02,404,0.520040,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:41:17,404,0.478813,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:41:33,404,0.431037,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:41:48,404,0.468378,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:42:04,404,0.448020,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:42:19,404,0.409096,{"status":"error";"code":404;"message":"Application not foun
+2026-11-24 17:42:35,200,0.593734,{"status":"UP"}
+2026-11-24 17:42:50,200,0.624657,{"status":"UP"}
+2026-11-24 17:43:06,200,0.650308,{"status":"UP"}
+2026-11-24 17:43:22,200,0.448926,{"status":"UP"}
+2026-11-24 17:43:37,200,0.486778,{"status":"UP"}
+2026-11-24 17:43:53,200,0.520952,{"status":"UP"}
+2026-11-24 17:44:08,200,0.508452,{"status":"UP"}
+2026-11-24 17:44:24,200,0.575611,{"status":"UP"}
+2026-11-24 17:44:39,200,0.573772,{"status":"UP"}
+2026-11-24 17:44:55,200,0.482375,{"status":"UP"}
+2026-11-24 17:45:10,200,0.470065,{"status":"UP"}
+2026-11-24 17:45:26,200,0.476827,{"status":"UP"}
+2026-11-24 17:45:41,200,0.581539,{"status":"UP"}
+2026-11-24 17:45:57,200,0.573121,{"status":"UP"}
+2026-11-24 17:46:13,200,0.513990,{"status":"UP"}
+2026-11-24 17:46:28,200,0.484584,{"status":"UP"}
