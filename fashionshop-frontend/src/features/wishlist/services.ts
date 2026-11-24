@@ -1,7 +1,7 @@
 import { api, apiRequest } from '@/lib/api/http';
 import type { ApiResponse } from '@/lib/api/types';
 import type { WishlistItem } from '@/types/wishlist';
-import { mockWishlist, allMockProducts } from '@/data/mock-data';
+import { mockWishlist } from '@/data/mock-data';
 
 // TODO: Remove mock helpers once the real backend is available
 const USE_MOCK = false;

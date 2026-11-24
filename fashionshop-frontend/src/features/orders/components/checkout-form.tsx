@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm, type UseFormRegisterReturn } from 'react-hook-form';
+import { useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -55,7 +55,7 @@ export function CheckoutForm({
     },
   });
 
-  const selectedMethod = form.watch('paymentMethod');
+  const selectedMethod = useWatch({ control: form.control, name: 'paymentMethod' });
 
   const handleSubmit = (data: FormFields) => {
     onSubmit({

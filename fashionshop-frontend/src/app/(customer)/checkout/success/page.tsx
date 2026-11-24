@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 import type { OrderSummaryItem } from '@/types/order';
 
 type StoredOrder = {
@@ -17,25 +17,29 @@ type StoredOrder = {
     total: number;
 };
 
+function subscribeToOrder(callback: () => void) {
+    window.addEventListener('storage', callback);
+    return () => window.removeEventListener('storage', callback);
+}
+
+function readStoredOrder() {
+    try { return sessionStorage.getItem('lastOrder'); } catch { return null; }
+}
+
 const STEPS = ['Placed', 'Processing', 'Shipped', 'Delivered'];
 
 export default function CheckoutSuccessPage() {
     const searchParams = useSearchParams();
     const method = searchParams.get('method');
-    const [order, setOrder] = useState<StoredOrder | null>(null);
-
-    useEffect(() => {
-        try {
-            const raw = sessionStorage.getItem('lastOrder');
-            if (raw) setOrder(JSON.parse(raw));
-        } catch {
-            /* ignore */
-        }
-    }, []);
+    const rawOrder = useSyncExternalStore(subscribeToOrder, readStoredOrder, () => null);
+    const order = useMemo<StoredOrder | null>(() => {
+        try { return rawOrder ? JSON.parse(rawOrder) as StoredOrder : null; }
+        catch { return null; }
+    }, [rawOrder]);
 
     const isMomo = method === 'MOMO';
     const paymentLabel = isMomo ? 'Momo E-Wallet' : 'Cash on Delivery';
-    const orderNumber = order?.orderNumber ?? `FS-${Date.now().toString().slice(-8)}`;
+    const orderNumber = order?.orderNumber ?? 'Unavailable';
 
     return (
         <main className="min-h-screen font-body text-[#1a1c1c]">
@@ -61,9 +65,7 @@ export default function CheckoutSuccessPage() {
                                 <div>
                                     <h2 className="text-sm font-bold">Estimated Arrival</h2>
                                     <p className="mt-1 text-xs text-[#999999]">
-                                        {new Date(Date.now() + 7 * 86400000).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
-                                        {' – '}
-                                        {new Date(Date.now() + 14 * 86400000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                        7–14 days after your order is placed
                                     </p>
                                 </div>
                                 <span className="rounded-full bg-black px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white">

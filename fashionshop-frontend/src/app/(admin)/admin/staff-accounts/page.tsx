@@ -4,8 +4,6 @@ import Link from 'next/link';
 
 import { useMemo, useState } from 'react';
 import { StaffTable } from '@/features/users/components/admin/staff-table';
-import { LoadingState } from '@/components/common/loading-state';
-import { EmptyState } from '@/components/common/empty-state';
 import { ConfirmDialog } from '@/components/common/confirm-dialog';
 import { useAdminStaffAccountsQuery, useDeleteAdminUserMutation, useActivateAdminUserMutation } from '@/features/users/hooks';
 import { toast } from 'sonner';
@@ -71,7 +69,7 @@ export default function AdminStaffAccountsPage() {
             Staff Accounts
           </h2>
           <p className="text-neutral-500 text-sm font-body">
-            Manage your store's administrative and staff access.
+            Manage your store&apos;s administrative and staff access.
           </p>
         </div>
         <div className="flex gap-4">

@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useCreateProductMutation, useUpdateManageProductMutation } from '@/features/products/hooks';
 import { useCategoriesQuery } from '@/features/categories/hooks';
@@ -43,8 +42,8 @@ export function ProductForm({ initialData, redirectPath = '/admin/products' }: P
     control,
     setValue,
     formState: { errors },
-  } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema) as any,
+  } = useForm<z.input<typeof productSchema>, unknown, ProductFormValues>({
+    resolver: zodResolver(productSchema),
     defaultValues: {
       name: initialData?.name || '',
       description: initialData?.description || '',
@@ -67,26 +66,26 @@ export function ProductForm({ initialData, redirectPath = '/admin/products' }: P
   const onSubmit: SubmitHandler<ProductFormValues> = (data) => {
     const payload = {
       ...data,
-      categoryId: data.categoryId || (categories.length > 0 ? categories[0].id : 1), 
+      categoryId: data.categoryId || (categories.length > 0 ? Number(categories[0].id) : 1),
     };
 
     if (initialData) {
-      updateMutation.mutate(payload as any, {
+      updateMutation.mutate(payload, {
         onSuccess: () => {
           toast.success('Product updated successfully');
           router.push(redirectPath);
         },
-        onError: (error: any) => {
+        onError: (error) => {
           toast.error(error.message || 'Failed to update product');
         },
       });
     } else {
-      createMutation.mutate(payload as any, {
+      createMutation.mutate(payload, {
         onSuccess: () => {
           toast.success('Product created successfully');
           router.push(redirectPath);
         },
-        onError: (error: any) => {
+        onError: (error) => {
           toast.error(error.message || 'Failed to create product');
         },
       });

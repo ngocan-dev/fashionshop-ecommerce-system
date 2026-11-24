@@ -70,7 +70,7 @@ export function DashboardView({ data, isLoading }: { data?: DashboardPayload; is
           
           {/* Chart using revenueChart */}
           <div className="h-64 flex items-end justify-between gap-2 px-2">
-            {data.revenueChart.slice(-12).map((item, i) => {
+            {data.revenueChart.slice(-12).map((item) => {
               const maxAmount = Math.max(...data.revenueChart.map(d => d.value), 1);
               const height = (item.value / maxAmount) * 100;
               return (

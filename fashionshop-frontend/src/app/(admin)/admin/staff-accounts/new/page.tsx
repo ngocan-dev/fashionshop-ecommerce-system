@@ -1,12 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 import { StaffForm } from '@/features/users/components/admin/staff-form';
 
 export default function AddStaffPage() {
-  const router = useRouter();
 
   return (
     <div className="max-w-6xl mx-auto py-12">

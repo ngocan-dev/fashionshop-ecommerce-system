@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   useManageProductsQuery,
@@ -10,7 +9,6 @@ import {
 import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
-import { LoadingState } from "@/components/common/loading-state";
 import { EmptyState } from "@/components/common/empty-state";
 import { ProductTable } from "@/features/products/components/admin/product-table";
 import { ProductStats } from "@/features/products/components/product-stats";

@@ -1,10 +1,22 @@
 import { api, apiRequest } from '@/lib/api/http';
-import type { ApiListResponse, ApiResponse } from '@/lib/api/types';
+import type { ApiResponse } from '@/lib/api/types';
 import type { CheckoutSummary, CreateOrderRequest, Order, OrderFilter, OrderSummaryItem } from '@/types/order';
 import type { Payment } from '@/types/payment';
-import { mockOrders, getMockOrder, mockCart } from '@/data/mock-data';
+import { mockOrders, getMockOrder } from '@/data/mock-data';
 
 const USE_MOCK = false;
+type OrderItemResponse = Omit<Partial<OrderSummaryItem>, 'productId'> & { productId?: string | number; unitPrice?: number; productName?: string; lineTotal?: number; productImage?: string };
+type OrderResponse = Omit<Partial<Order>, 'id' | 'items'> & {
+  id?: string | number; orderId?: string | number; orderCode?: string;
+  receiverName?: string; phone?: string; orderStatus?: string; currentStatus?: string;
+  orderDate?: string; totalAmount?: number; totalPrice?: number; discountAmount?: number; customerNote?: string;
+  summary?: { orderId?: string | number; orderStatus?: string; customerName?: string; customerEmail?: string; customerPhone?: string; orderDate?: string; totalAmount?: number; subtotal?: number; shippingFee?: number; discountAmount?: number };
+  customer?: { fullName?: string; email?: string; phoneNumber?: string; shippingAddress?: string };
+  additionalInfo?: { createdAt?: string; customerNote?: string };
+  items?: OrderItemResponse[];
+};
+type CheckoutResponse = Omit<CheckoutSummary, 'items'> & { items: OrderItemResponse[] };
+type OrderPage = { items: OrderResponse[]; total?: number; totalItems?: number; totalPages: number; page: number; size: number };
 
 function normalizeOrderStatus(value: unknown): Order['status'] {
   if (typeof value !== 'string' || !value.trim()) {
@@ -26,11 +38,11 @@ function normalizeOrderStatus(value: unknown): Order['status'] {
   }
 }
 
-function normalizeOrderItem(raw: any): OrderSummaryItem {
+function normalizeOrderItem(raw: OrderItemResponse): OrderSummaryItem {
   const price = raw.price ?? raw.unitPrice ?? 0;
   const qty = raw.quantity ?? 0;
   return {
-    productId: raw.productId,
+    productId: String(raw.productId ?? ''),
     name: raw.name ?? raw.productName ?? '',
     quantity: qty,
     price,
@@ -39,7 +51,7 @@ function normalizeOrderItem(raw: any): OrderSummaryItem {
   };
 }
 
-function normalizeOrder(raw: any): Order {
+function normalizeOrder(raw: OrderResponse): Order {
   const summary = raw.summary || {};
   const customer = raw.customer || {};
   const additionalInfo = raw.additionalInfo || {};
@@ -47,7 +59,7 @@ function normalizeOrder(raw: any): Order {
   
   return {
     ...raw,
-    id: raw.id ? String(raw.id) : (raw.orderId ? String(raw.orderId) : (summary.orderId ? String(summary.orderId) : raw.orderCode)),
+    id: raw.id ? String(raw.id) : (raw.orderId ? String(raw.orderId) : (summary.orderId ? String(summary.orderId) : raw.orderCode ?? '')),
     customerName: raw.customerName || raw.receiverName || summary.customerName || customer.fullName || '',
     customerEmail: raw.customerEmail || summary.customerEmail || customer.email || '',
     customerPhone: raw.customerPhone || summary.customerPhone || customer.phoneNumber || raw.phone || '',
@@ -85,7 +97,7 @@ function filterOrders(orders: Order[], filter?: OrderFilter): Order[] {
   return filteredItems;
 }
 
-function normalizeCheckoutSummary(raw: any): CheckoutSummary {
+function normalizeCheckoutSummary(raw: CheckoutResponse): CheckoutSummary {
   return {
     ...raw,
     items: Array.isArray(raw.items) ? raw.items.map(normalizeOrderItem) : [],
@@ -108,13 +120,13 @@ export async function fetchCheckoutSummary(): Promise<CheckoutSummary> {
       finalTotal: 0,
     };
   }
-  const response = await api.get<ApiResponse<any>>('/api/orders/checkout-summary');
+  const response = await api.get<ApiResponse<CheckoutResponse>>('/api/orders/checkout-summary');
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeCheckoutSummary(raw);
 }
 
 export async function updateCheckoutPaymentMethod(paymentMethod: string) {
-  const response = await api.patch<ApiResponse<any>>('/api/orders/checkout/payment-method', { paymentMethod });
+  const response = await api.patch<ApiResponse<CheckoutResponse>>('/api/orders/checkout/payment-method', { paymentMethod });
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeCheckoutSummary(raw);
 }
@@ -132,21 +144,21 @@ export async function createOrder(request: CreateOrderRequest) {
       createdAt: new Date().toISOString(),
     } as unknown as Order;
   }
-  const response = await api.post<ApiResponse<any>>('/api/orders', request);
+  const response = await api.post<ApiResponse<OrderResponse>>('/api/orders', request);
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeOrder(raw);
 }
 
 export async function fetchMyOrders() {
   if (USE_MOCK) return mockOrders;
-  const response = await api.get<ApiResponse<any[]>>('/api/orders/my');
+  const response = await api.get<ApiResponse<OrderResponse[]>>('/api/orders/my');
   const raw = await apiRequest(Promise.resolve(response));
   return Array.isArray(raw) ? raw.map(normalizeOrder) : [];
 }
 
 export async function fetchMyOrderHistory() {
   if (USE_MOCK) return mockOrders;
-  const response = await api.get<ApiResponse<any>>('/api/orders/my/history');
+  const response = await api.get<ApiResponse<OrderPage>>('/api/orders/my/history');
   const raw = await apiRequest(Promise.resolve(response));
   // history returns paginated: { items: [], ... }
   if (raw && Array.isArray(raw.items)) return { ...raw, items: raw.items.map(normalizeOrder) };
@@ -154,7 +166,7 @@ export async function fetchMyOrderHistory() {
 }
 
 export async function fetchMyOrder(orderId: string) {
-  const response = await api.get<ApiResponse<any>>(`/api/orders/my/${orderId}`);
+  const response = await api.get<ApiResponse<OrderResponse>>(`/api/orders/my/${orderId}`);
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeOrder(raw);
 }
@@ -170,20 +182,20 @@ export async function fetchMyOrderStatus(orderId: string) {
 }
 
 export async function cancelMyOrder(orderId: string) {
-  const response = await api.patch<ApiResponse<any>>(`/api/orders/my/${orderId}/cancel`);
+  const response = await api.patch<ApiResponse<OrderResponse>>(`/api/orders/my/${orderId}/cancel`);
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeOrder(raw);
 }
 
 export async function fetchOrders() {
-  const response = await api.get<ApiResponse<any[]>>('/api/orders');
+  const response = await api.get<ApiResponse<OrderResponse[]>>('/api/orders');
   const raw = await apiRequest(Promise.resolve(response));
   return Array.isArray(raw) ? raw.map(normalizeOrder) : [];
 }
 
 export async function fetchManageOrders(filter?: OrderFilter) {
   if (USE_MOCK) {
-    let filteredItems = filterOrders(mockOrders, filter);
+    const filteredItems = filterOrders(mockOrders, filter);
 
     const page = filter?.page ?? 0;
     const size = filter?.size ?? 10;
@@ -200,7 +212,7 @@ export async function fetchManageOrders(filter?: OrderFilter) {
     };
   }
 
-  const response = await api.get<ApiResponse<any>>('/api/orders', { params: filter });
+  const response = await api.get<ApiResponse<OrderPage>>('/api/orders', { params: filter });
   const raw = await apiRequest(Promise.resolve(response));
   if (raw && Array.isArray(raw.items)) {
     return {
@@ -223,19 +235,19 @@ export async function fetchManageOrders(filter?: OrderFilter) {
 
 export async function fetchManageOrder(orderId: string) {
   if (USE_MOCK) return getMockOrder(orderId);
-  const response = await api.get<ApiResponse<any>>(`/api/orders/manage/${orderId}`);
+  const response = await api.get<ApiResponse<OrderResponse>>(`/api/orders/manage/${orderId}`);
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeOrder(raw);
 }
 
 export async function fetchOrder(orderId: string) {
-  const response = await api.get<ApiResponse<any>>(`/api/orders/${orderId}`);
+  const response = await api.get<ApiResponse<OrderResponse>>(`/api/orders/${orderId}`);
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeOrder(raw);
 }
 
 export async function updateOrderStatus(orderId: string, status: string) {
-  const response = await api.patch<ApiResponse<any>>(`/api/orders/${orderId}/status`, { status });
+  const response = await api.patch<ApiResponse<OrderResponse>>(`/api/orders/${orderId}/status`, { status });
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeOrder(raw);
 }
@@ -246,7 +258,7 @@ export async function updateManageOrderStatus(orderId: string, status: string) {
     if (index !== -1) {
       mockOrders[index] = {
         ...mockOrders[index],
-        status: status as any,
+        status: normalizeOrderStatus(status),
         activityLog: [
           {
             status: `Order ${status.toLowerCase()}`,
@@ -265,7 +277,7 @@ export async function updateManageOrderStatus(orderId: string, status: string) {
       return mockOrders[index];
     }
   }
-  const response = await api.patch<ApiResponse<any>>(`/api/orders/manage/${orderId}/status`, { status });
+  const response = await api.patch<ApiResponse<OrderResponse>>(`/api/orders/manage/${orderId}/status`, { status });
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeOrder(raw);
 }

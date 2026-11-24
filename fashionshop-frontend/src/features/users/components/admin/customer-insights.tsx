@@ -6,7 +6,7 @@ export function CustomerInsights() {
       <div className="col-span-12 lg:col-span-4 bg-neutral-900 text-white p-8 rounded-md">
         <h4 className="font-headline font-bold text-xl mb-4 uppercase tracking-tight">Segment Insight</h4>
         <p className="text-neutral-400 text-sm leading-relaxed mb-6 font-body">
-          Your most profitable customers are "Active Creatives" aged 24-28, with a repeat purchase rate of 4.2x above average.
+          Your most profitable customers are &quot;Active Creatives&quot; aged 24-28, with a repeat purchase rate of 4.2x above average.
         </p>
         <div className="pt-6 border-t border-neutral-800">
           <div className="flex justify-between items-end mb-2">
@@ -24,7 +24,7 @@ export function CustomerInsights() {
           <span className="material-symbols-outlined text-primary mb-4">mail</span>
           <h5 className="font-bold text-sm mb-2 uppercase tracking-widest font-label">Bulk Outreach</h5>
           <p className="text-xs text-neutral-500 mb-4 leading-relaxed font-body">
-            Engage with 142 customers who haven't purchased in the last 3 months.
+            Engage with 142 customers who haven&apos;t purchased in the last 3 months.
           </p>
           <button className="text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary hover:opacity-70 transition-opacity">
             Draft Campaign

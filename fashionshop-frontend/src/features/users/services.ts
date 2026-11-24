@@ -48,7 +48,7 @@ export async function createStaffAccount(request: { fullName: string; email: str
       id: Math.random().toString(36).substring(7),
       email: request.email,
       fullName: request.fullName,
-      role: (request.role as any) || 'STAFF',
+      role: (request.role as StaffAccount['role']) || 'STAFF',
       isActive: true,
     };
     mockStaff.push(newStaff);
@@ -64,7 +64,7 @@ export async function updateStaffAccount(id: string, request: { fullName: string
     if (staff) {
       staff.fullName = request.fullName;
       staff.email = request.email;
-      if (request.role) staff.role = request.role as any;
+      if (request.role) staff.role = request.role as StaffAccount['role'];
       return staff;
     }
     throw new Error('Staff not found');
@@ -99,9 +99,9 @@ export async function deleteAdminUser(userId: string) {
 
 export async function fetchAdminStaffAccounts() {
   if (USE_MOCK) return mockStaff;
-  const response = await api.get<ApiResponse<any>>('/api/admin/staff-accounts');
+  const response = await api.get<ApiResponse<Array<StaffAccount & { status: AuthUser['accountStatus'] }>>>('/api/admin/staff-accounts');
   const raw = await apiRequest(Promise.resolve(response));
-  return Array.isArray(raw) ? raw.map((staff: any) => ({
+  return Array.isArray(raw) ? raw.map((staff) => ({
     ...staff,
     isActive: staff.status === 'ACTIVE',
     accountStatus: staff.status,
@@ -110,9 +110,9 @@ export async function fetchAdminStaffAccounts() {
 
 export async function fetchAdminCustomerAccounts() {
   if (USE_MOCK) return mockCustomers;
-  const response = await api.get<ApiResponse<any>>('/api/admin/customer-accounts');
+  const response = await api.get<ApiResponse<Array<CustomerAccount & { status: AuthUser['accountStatus'] }>>>('/api/admin/customer-accounts');
   const raw = await apiRequest(Promise.resolve(response));
-  return Array.isArray(raw) ? raw.map((c: any) => ({
+  return Array.isArray(raw) ? raw.map((c) => ({
     ...c,
     id: String(c.id),
     fullName: c.fullName ?? '',

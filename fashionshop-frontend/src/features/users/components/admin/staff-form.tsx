@@ -41,7 +41,7 @@ export function StaffForm({ initialData }: Props) {
           toast.success('Staff member updated successfully');
           router.push('/admin/staff-accounts');
         },
-        onError: (err: any) => toast.error(err.message || 'Failed to update')
+        onError: (err) => toast.error(err.message || 'Failed to update')
       });
       return;
     }
@@ -72,7 +72,7 @@ export function StaffForm({ initialData }: Props) {
         toast.success('Staff member created successfully');
         router.push('/admin/staff-accounts');
       },
-      onError: (err: any) => toast.error(err.message || 'Failed to create')
+      onError: (err) => toast.error(err.message || 'Failed to create')
     });
   };
 

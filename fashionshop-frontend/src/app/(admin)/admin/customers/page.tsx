@@ -104,7 +104,7 @@ export default function AdminCustomersPage() {
             Customers
           </h2>
           <p className="text-neutral-500 text-sm font-body">
-            Manage your studio's client base and order history.
+            Manage your studio&apos;s client base and order history.
           </p>
         </div>
       </div>

@@ -18,7 +18,7 @@ function formatPrice(value: number) {
 
 export function NewArrivalsSection() {
   const { data, isLoading } = useHomeQuery();
-  const arrivals = data?.newArrivals ?? [];
+  const arrivals = useMemo(() => data?.newArrivals ?? [], [data?.newArrivals]);
   const [activeCategory, setActiveCategory] = useState<string>(ALL_FILTER);
 
   const categories = useMemo(() => {

@@ -242,7 +242,7 @@ export const getMockProduct = (idOrSlug: string): Product | undefined => {
     return allMockProducts.find(p => p.id === idOrSlug || p.slug === idOrSlug);
 };
 
-export const addMockProduct = (request: any): Product => {
+export const addMockProduct = (request: Omit<Product, 'id'>): Product => {
     const newProduct: Product = {
         id: `prod_${Math.random().toString(36).substr(2, 9)}`,
         ...request,

@@ -1,17 +1,21 @@
 import { api, apiRequest } from '@/lib/api/http';
 import type { ApiResponse } from '@/lib/api/types';
 import type { Product, ProductFilter, UpsertProductRequest } from '@/types/product';
-import { allMockProducts, getMockProduct, addMockProduct } from '@/data/mock-data';
+import { allMockProducts, getMockProduct } from '@/data/mock-data';
 
 // TODO: Remove mock helpers once the real backend is available
 const USE_MOCK = false;
+type ProductResponse = Product & {
+  thumbnailUrl?: string; mainImageUrl?: string; colorOptions?: string[];
+  sizeOptions?: string[]; originalPrice?: number;
+};
 
 // ---------------------------------------------------------------------------
 // Normalizers: bridge backend field names → frontend Product type
 // ---------------------------------------------------------------------------
 
 /** Normalize a manage-endpoint product (ProductManageSummaryResponse / ProductManageUpdateResponse) */
-function normalizeManageProduct(raw: any): Product {
+function normalizeManageProduct(raw: ProductResponse): Product {
   return {
     ...raw,
     imageUrl: raw.imageUrl ?? raw.thumbnailUrl ?? undefined,
@@ -21,7 +25,7 @@ function normalizeManageProduct(raw: any): Product {
 }
 
 /** Normalize a store product detail (StoreProductDetailResponse) */
-function normalizeStoreProductDetail(raw: any): Product {
+function normalizeStoreProductDetail(raw: ProductResponse): Product {
   const mainImg = raw.mainImageUrl ?? raw.imageUrl ?? undefined;
   return {
     ...raw,
@@ -173,7 +177,7 @@ export async function fetchManageProducts(filter?: ProductFilter): Promise<Manag
       },
     };
   }
-  const response = await api.get<ApiResponse<any>>('/api/products/manage', { params: filter });
+  const response = await api.get<ApiResponse<Omit<ManageProductsResponse, 'items'> & { items: ProductResponse[] }>>('/api/products/manage', { params: filter });
   const raw = await apiRequest(Promise.resolve(response));
   if (raw && Array.isArray(raw.items)) {
     return {
@@ -195,7 +199,7 @@ export async function fetchManageProducts(filter?: ProductFilter): Promise<Manag
 
 export async function fetchManageProduct(id: string) {
   if (USE_MOCK) return getMockProduct(id);
-  const response = await api.get<ApiResponse<any>>(`/api/products/manage/${id}`);
+  const response = await api.get<ApiResponse<ProductResponse>>(`/api/products/manage/${id}`);
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeManageProduct(raw);
 }
@@ -263,7 +267,7 @@ export async function fetchStoreProducts(filter?: ProductFilter): Promise<StoreP
 
 export async function fetchStoreProduct(idOrSlug: string) {
   if (USE_MOCK) return getMockProduct(idOrSlug);
-  const response = await api.get<ApiResponse<any>>(`/api/store/products/${idOrSlug}`);
+  const response = await api.get<ApiResponse<ProductResponse>>(`/api/store/products/${idOrSlug}`);
   const raw = await apiRequest(Promise.resolve(response));
   return normalizeStoreProductDetail(raw);
 }

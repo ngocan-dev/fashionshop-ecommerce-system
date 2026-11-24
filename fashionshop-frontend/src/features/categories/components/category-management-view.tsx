@@ -32,7 +32,7 @@ export function CategoryManagementView({ emptyActionHref }: CategoryManagementVi
     defaultValues: { name: '', description: '' },
   });
 
-  const categories = categoriesQuery.data ?? [];
+  const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
   const filteredCategories = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
     if (!keyword) return categories;
