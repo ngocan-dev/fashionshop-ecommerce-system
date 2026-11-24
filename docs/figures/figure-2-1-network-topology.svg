@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 820" width="1280" height="820" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+
+  <rect width="1280" height="820" fill="#ffffff"/>
+  <text x="640" y="42" text-anchor="middle" font-size="24" font-weight="700" fill="#111827">FashionShop network topology on Vercel and Railway</text>
+  <text x="640" y="68" text-anchor="middle" font-size="14" fill="#4b5563">Customer request path (solid) and operational traffic (dashed), 24 November 2026</text>
+
+  <!-- Left column: clients -->
+  <rect x="40" y="140" width="220" height="100" rx="10" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>
+  <text x="150" y="176" text-anchor="middle" font-size="17" font-weight="700" fill="#1e1b4b">Browser</text>
+  <text x="150" y="200" text-anchor="middle" font-size="13" fill="#374151">Customer / Staff / Admin</text>
+  <text x="150" y="220" text-anchor="middle" font-size="13" fill="#374151">JWT stored client-side</text>
+
+  <rect x="40" y="370" width="220" height="110" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="150" y="404" text-anchor="middle" font-size="17" font-weight="700" fill="#14532d">UptimeRobot</text>
+  <text x="150" y="428" text-anchor="middle" font-size="13" fill="#374151">Keyword monitor, 5 min</text>
+  <text x="150" y="448" text-anchor="middle" font-size="13" fill="#374151">e-mail alert on DOWN / UP</text>
+
+  <rect x="40" y="620" width="260" height="150" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="170" y="652" text-anchor="middle" font-size="17" font-weight="700" fill="#7c2d12">Operator laptop</text>
+  <text x="170" y="676" text-anchor="middle" font-size="13" fill="#374151">Railway CLI + mysqldump</text>
+  <text x="170" y="696" text-anchor="middle" font-size="13" fill="#374151">backups/railway-*.sql (gitignored)</text>
+  <text x="170" y="716" text-anchor="middle" font-size="13" fill="#374151">Restore test: MySQL 8.0</text>
+  <text x="170" y="736" text-anchor="middle" font-size="13" fill="#374151">fashionshop_restore_test</text>
+
+  <!-- Vercel -->
+  <rect x="360" y="110" width="300" height="130" rx="10" fill="#f9fafb" stroke="#111827" stroke-width="2"/>
+  <text x="510" y="142" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">Vercel (Hobby)</text>
+  <text x="510" y="168" text-anchor="middle" font-size="14" fill="#111827">Next.js frontend</text>
+  <text x="510" y="190" text-anchor="middle" font-size="12" fill="#4b5563">fashionshop-ecommerce-system.vercel.app</text>
+  <text x="510" y="212" text-anchor="middle" font-size="12" fill="#4b5563">NEXT_PUBLIC_API_BASE_URL → Railway API</text>
+
+  <!-- Railway project -->
+  <rect x="360" y="290" width="600" height="300" rx="12" fill="#faf5ff" stroke="#7e22ce" stroke-width="2"/>
+  <text x="390" y="572" font-size="16" font-weight="700" fill="#581c87">Railway project fashionshop-sna</text>
+  <text x="390" y="550" font-size="13" fill="#6b21a8">environment: production</text>
+
+  <rect x="390" y="340" width="250" height="130" rx="10" fill="#ffffff" stroke="#7e22ce" stroke-width="2"/>
+  <text x="515" y="368" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Spring Boot backend</text>
+  <text x="515" y="390" text-anchor="middle" font-size="13" fill="#374151">Java 17 container, port 8081</text>
+  <text x="515" y="410" text-anchor="middle" font-size="13" fill="#374151">profile prod, ddl-auto=validate</text>
+  <text x="515" y="430" text-anchor="middle" font-size="13" fill="#374151">GET /api/health (SELECT 1)</text>
+  <text x="515" y="452" text-anchor="middle" font-size="11" fill="#6b7280">…-production.up.railway.app</text>
+
+  <rect x="670" y="330" width="275" height="245" rx="10" fill="none" stroke="#7e22ce" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="808" y="352" text-anchor="middle" font-size="12" font-weight="700" fill="#7e22ce">PRIVATE NETWORK ONLY</text>
+
+  <rect x="690" y="365" width="235" height="95" rx="10" fill="#ffffff" stroke="#7e22ce" stroke-width="2"/>
+  <text x="808" y="393" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">MySQL 8.4.13</text>
+  <text x="808" y="415" text-anchor="middle" font-size="13" fill="#374151">database: railway</text>
+  <text x="808" y="435" text-anchor="middle" font-size="12" fill="#374151">mysql.railway.internal:3306</text>
+
+  <ellipse cx="808" cy="480" rx="90" ry="10" fill="#ede9fe" stroke="#7e22ce" stroke-width="1.5"/>
+  <path d="M718,480 V515 A90,10 0 0 0 898,515 V480" fill="#ede9fe" stroke="#7e22ce" stroke-width="1.5"/>
+  <text x="808" y="508" text-anchor="middle" font-size="13" fill="#3b0764">mysql-volume</text>
+  <line x1="808" y1="460" x2="808" y2="470" stroke="#7e22ce" stroke-width="1.5"/>
+
+  <text x="870" y="556" text-anchor="middle" font-size="11" fill="#6b7280">no public DB proxy</text>
+
+  <!-- GitHub -->
+  <rect x="1010" y="110" width="240" height="190" rx="10" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+  <text x="1130" y="142" text-anchor="middle" font-size="17" font-weight="700" fill="#0f172a">GitHub</text>
+  <text x="1130" y="166" text-anchor="middle" font-size="13" fill="#374151">Repository, branch main</text>
+  <text x="1130" y="188" text-anchor="middle" font-size="13" fill="#374151">Actions CI: backend, frontend</text>
+  <text x="1130" y="210" text-anchor="middle" font-size="13" fill="#374151">Ruleset protect-main:</text>
+  <text x="1130" y="230" text-anchor="middle" font-size="13" fill="#374151">PR + required checks,</text>
+  <text x="1130" y="250" text-anchor="middle" font-size="13" fill="#374151">no force push, no bypass</text>
+
+  <!-- Customer path (solid) -->
+  <line x1="260" y1="175" x2="356" y2="175" stroke="#1f2937" stroke-width="2.5" marker-end="url(#a)"/>
+  <circle cx="300" cy="160" r="11" fill="#1f2937"/><text x="300" y="165" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">1</text>
+  <text x="308" y="196" text-anchor="middle" font-size="12" fill="#1f2937">HTTPS</text>
+
+  <path d="M260,215 H325 V385 H386" fill="none" stroke="#1f2937" stroke-width="2.5" marker-start="url(#a)" marker-end="url(#a)"/>
+  <circle cx="325" cy="290" r="11" fill="#1f2937"/><text x="325" y="295" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">2</text>
+  <circle cx="325" cy="330" r="11" fill="#1f2937"/><text x="325" y="335" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">4</text>
+  <text x="312" y="268" text-anchor="end" font-size="11" fill="#1f2937">REST + JWT</text>
+  <text x="312" y="355" text-anchor="end" font-size="11" fill="#1f2937">JSON</text>
+
+  <line x1="640" y1="410" x2="686" y2="410" stroke="#1f2937" stroke-width="2.5" marker-end="url(#a)"/>
+  <circle cx="663" cy="392" r="11" fill="#1f2937"/><text x="663" y="397" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">3</text>
+
+  <!-- Operational traffic (dashed) -->
+  <path d="M1010,150 H664" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#g)"/>
+  <text x="835" y="142" text-anchor="middle" font-size="12" fill="#374151">auto deploy from main (PRs → Preview only)</text>
+
+  <path d="M1010,265 H515 V336" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#g)"/>
+  <text x="790" y="258" text-anchor="middle" font-size="12" fill="#374151">deploy from main after CI (Wait for CI, watch path /fashionshop-backend/**)</text>
+
+  <path d="M260,430 H386" fill="none" stroke="#16a34a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#g)"/>
+  <text x="323" y="448" text-anchor="middle" font-size="11" fill="#14532d">HTTPS GET</text>
+  <text x="323" y="462" text-anchor="middle" font-size="11" fill="#14532d">/api/health</text>
+
+  <path d="M300,695 H750 V528" fill="none" stroke="#ea580c" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#g)"/>
+  <text x="525" y="686" text-anchor="middle" font-size="12" fill="#7c2d12">Railway CLI SSH tunnel (encrypted) → mysqldump --single-transaction</text>
+
+  <!-- Legend -->
+  <rect x="1010" y="610" width="240" height="160" rx="10" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5"/>
+  <text x="1030" y="636" font-size="14" font-weight="700" fill="#111827">Legend</text>
+  <line x1="1030" y1="660" x2="1080" y2="660" stroke="#1f2937" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="1090" y="664" font-size="12" fill="#374151">Customer request path</text>
+  <line x1="1030" y1="688" x2="1080" y2="688" stroke="#6b7280" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#g)"/>
+  <text x="1090" y="692" font-size="12" fill="#374151">Operational traffic</text>
+  <rect x="1030" y="704" width="50" height="22" fill="none" stroke="#7e22ce" stroke-dasharray="6 4"/>
+  <text x="1090" y="720" font-size="12" fill="#374151">Private network</text>
+  <text x="1030" y="750" font-size="11" fill="#6b7280">1 load UI · 2 API call · 3 query DB</text>
+  <text x="1030" y="764" font-size="11" fill="#6b7280">4 JSON response to browser</text>
+</svg>

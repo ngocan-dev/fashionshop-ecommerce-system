@@ -58,6 +58,12 @@ Use Figure 2.1 in section 2.1 to explain this sequence: (1) load the frontend, (
 
 ### 2.1 Network Topology
 
+> 📷 **Insert image:** `02-01-network-topology.png` (source: `docs/figures/figure-2-1-network-topology.svg`)
+>
+> **Figure 2.1.** FashionShop network topology on Vercel and Railway. Solid arrows show the customer request path: (1) the browser loads the Next.js frontend from Vercel over HTTPS, (2) it calls the Spring Boot API on Railway with REST and a JWT, (3) the backend queries MySQL over Railway private networking (`mysql.railway.internal:3306`), and (4) JSON returns to the browser. Dashed arrows show operational traffic: GitHub deploys from `main` after CI (PRs get Vercel previews only; Railway waits for CI and watches `/fashionshop-backend/**`), UptimeRobot checks `/api/health` every 5 minutes and e-mails on DOWN/UP, and the operator takes backups through an encrypted Railway CLI tunnel. MySQL and its volume have no public endpoint.
+
+Text equivalent of the diagram:
+
 ```text
 Browser --(1) HTTPS--> Vercel / Next.js
 Browser --(2) HTTPS + REST/JWT--> Railway / Spring Boot
@@ -68,8 +74,6 @@ GitHub --PR checks (backend, frontend) + ruleset--> main --auto deploy--> Vercel
 UptimeRobot --HTTPS GET /api/health every 5 min--> Spring Boot --e-mail on DOWN/UP--> operator
 Operator laptop --Railway CLI SSH tunnel--> MySQL --mysqldump--> local backups/ (outside Git)
 ```
-
-Figure 2.1. FashionShop network topology on Vercel and Railway, including operational components. Replace this text drawing with the final rendered diagram before Word submission; keep the public/private boundary.
 
 | Connection | Configuration | Exposure |
 | --- | --- | --- |
